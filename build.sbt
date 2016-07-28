@@ -37,6 +37,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "requirejs" % "2.1.14-1",
   "org.webjars.npm" % "angular-ui-grid" % "3.1.1",
   "org.webjars" % "angular-ui" % "0.4.0-3",
+  "org.webjars" % "angularjs" % "1.2.16-2",
   "org.webjars" % "angular-file-upload" % "11.0.0"
 )
 
