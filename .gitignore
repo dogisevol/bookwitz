@@ -1,0 +1,14 @@
+logs
+project/project
+target
+dist
+/.idea
+/out
+/.idea_modules
+/.classpath
+/.project
+/RUNNING_PID
+/.settings
+/db
+.DS_Store
+evolutions

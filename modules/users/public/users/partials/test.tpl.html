@@ -1,0 +1,26 @@
+<bookwitz-header h1="Books"></bookwitz-header>
+<div ng-controller="BooksController as test">
+    <div ui-grid="gridOptions" ui-grid-selection ui-grid-pagination class="booksGrid"></div>
+    <div ng-app="fileUpload" ng-controller="BookUploadController as bookUpload">
+        <button type="button" ngf-select="uploadFiles($file, $invalidFiles)"
+                accept="plain/text" ngf-max-height="100000" ngf-max-size="1MB" class="btn btn-success">
+            Add book
+        </button>
+        <button type="button" class="btn btn-success" ng-click="toggleMultiSelect()">Delete</button>
+        <button type="button" class="btn btn-success" ng-click="hideWordsGrid = !hideWordsGrid">
+            Show words
+        </button>
+        <br><br>
+        File:
+        <div style="font:smaller">{{f.operation}}{{f.name}} {{errFile.name}} {{errFile.$error}} {{errFile.$errorParam}}
+  <span class="progress" ng-show="f.progress >= 0">
+      <div style="width:{{f.progress}}%"
+           ng-bind="f.progress + '%'"></div>
+  </span>
+        </div>
+        {{errorMsg}}
+        <div class="well" ng-hide="hideWordsGrid">
+            <div ui-grid="wordsGridOptions" ui-grid-selection ui-grid-pagination class="grid"></div>
+        </div>
+    </div>
+</div>

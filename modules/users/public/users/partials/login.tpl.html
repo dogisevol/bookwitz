@@ -1,0 +1,32 @@
+<bookwitz-header h1="Sign In" lead="Sign in to view your home page."></bookwitz-header>
+
+<form ng-controller="LoginController" ng-submit="login()" class="form-container" ng-class='{"has-error": form.errors.message != null}'>
+    <bookwitz-input
+            name="username"
+            model="form.username"
+            type="text"
+            errors="form.errors['username']"
+            placeholder="Email Address"
+            required="true"></bookwitz-input>
+
+    <bookwitz-input
+            name="password"
+            model="form.password"
+            type="password"
+            errors="form.errors['password']"
+            placeholder="Password"
+            required="true"></bookwitz-input>
+
+    <div ng-show="form.errors.message" class="text-center alert alert-danger">
+        {{form.errors.message}}
+    </div>
+
+    <div class=" text-center">
+    <bookwitz-submit value="Sign In" class="primary"></bookwitz-submit>
+
+    <p>
+        <a href="#/reset">Did you forget your password?</a>
+    </p>
+    <a href="#/signup">Sign up for a new account.</a>
+    </div>
+</form>

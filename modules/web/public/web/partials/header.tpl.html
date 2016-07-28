@@ -1,0 +1,13 @@
+<bookwitz-nav module="{{navModule || 'bookwitz'}}" service="{{navService || 'navigation'}}"></bookwitz-nav>
+
+<div class="page-header">
+    <span>
+        <h1>{{h1}} <small ng-show="subtext">{{subtext}}</small></h1>
+        <div ng-if="!lead">
+            <p class="lead" ng-transclude></p>
+        </div>
+        <div ng-if="lead">
+            <p class="lead">{{lead}}</p>
+        </div>
+    </span>
+</div>
