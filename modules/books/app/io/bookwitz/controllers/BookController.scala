@@ -8,7 +8,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import io.bookwitz.actors.BookProgressActor
 import io.bookwitz.models.{Book, BookWord}
-import io.bookwitz.models.BooksTableQueries.{bookWordsList, booksList}
+import io.bookwitz.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
 import io.bookwitz.service.WordnikService
 import io.bookwitz.users.models.BasicUser
 import play.api.Logger
@@ -53,6 +53,9 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   def bookWords(bookId: Long) = SecuredAction { request => {
     Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
       implicit val writes = Json.writes[BookWord]
+      val innerJoin = for {
+        (c, s) <- bookWordsList join dictionaryWordsList on (_.word === _.id)
+      } yield (c.wordId, s.word)
       Ok(Json.stringify(Json.toJson(bookWordsList.filter(_.bookId === bookId).list)))
     }
   }
