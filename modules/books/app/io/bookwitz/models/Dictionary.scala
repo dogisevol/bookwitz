@@ -7,7 +7,7 @@ case class WordDictionary(id: Option[Long], word: String) {
 }
 
 class WordDictionaries(tag: Tag) extends Table[WordDictionary](tag, "dictionary") {
-  def id = column[Option[Long]]("rowid", O.PrimaryKey, O.AutoInc)
+  def id = column[Option[Long]]("id", O.PrimaryKey, O.AutoInc)
 
   def word = column[String]("word")
 

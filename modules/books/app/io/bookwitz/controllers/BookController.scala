@@ -7,9 +7,8 @@ import akka.actor._
 import akka.pattern.ask
 import akka.util.Timeout
 import io.bookwitz.actors.BookProgressActor
-import io.bookwitz.models.{Book, BookWord}
 import io.bookwitz.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
-import io.bookwitz.service.WordnikService
+import io.bookwitz.models.{Book, BookWord}
 import io.bookwitz.users.models.BasicUser
 import play.api.Logger
 import play.api.Play.current
@@ -17,7 +16,6 @@ import play.api.db.DB
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsValue, Json, Writes}
-import play.api.libs.ws.WSClient
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
 import scala.concurrent.Future
@@ -44,19 +42,22 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
-  implicit val writer = new Writes[(String, String)] {
-    def writes(t: (String, String)): JsValue = {
-      Json.obj()
+
+  implicit val writer = new Writes[(Long, String, String, Long)] {
+    def writes(t: (Long, String, String, Long)): JsValue = {
+      Json.obj("bookId" -> t._1, "word" -> t._2, "tag" -> t._3, "freq" -> t._4)
     }
   }
 
   def bookWords(bookId: Long) = SecuredAction { request => {
     Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
       implicit val writes = Json.writes[BookWord]
+
+
       val innerJoin = for {
-        (c, s) <- bookWordsList join dictionaryWordsList on (_.word === _.id)
-      } yield (c.wordId, s.word)
-      Ok(Json.stringify(Json.toJson(bookWordsList.filter(_.bookId === bookId).list)))
+        (b, d) <- bookWordsList join dictionaryWordsList on (_.word === _.id)
+      } yield (b.bookId, d.word, b.tagColumn, b.freq)
+      Ok(Json.stringify(Json.toJson(innerJoin.filter(_._1 === bookId).list)))
     }
   }
   }
