@@ -37,7 +37,7 @@ libraryDependencies ++= Seq(
   "org.webjars" % "requirejs" % "2.1.14-1",
   "org.webjars.npm" % "angular-ui-grid" % "3.1.1",
   "org.webjars" % "angular-ui" % "0.4.0-3",
-  "org.webjars" % "angularjs" % "1.2.16-2",
+  "org.webjars.npm" % "angular" % "1.5.8",
   "org.webjars" % "angular-file-upload" % "11.0.0"
 )
 
@@ -88,3 +88,5 @@ unmanagedJars in Compile ++= {
 }
 
 resourceDirectories in Compile += baseDirectory.value / "lemmatizerResources"
+
+herokuAppName in Compile := "enigmatic-inlet-33873\nOpen app More "
