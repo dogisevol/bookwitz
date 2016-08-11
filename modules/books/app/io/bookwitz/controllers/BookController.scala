@@ -4,6 +4,8 @@ package io.bookwitz.controllers
 import java.io.File
 
 import akka.actor._
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.pattern.ask
 import akka.util.Timeout
 import io.bookwitz.actors.BookProgressActor
@@ -69,7 +71,13 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     val newFile = new File(file.getParentFile, uuid)
     file.renameTo(newFile)
     val title = request.body.asMultipartFormData.get.files.head.filename
-    BookController.system.actorOf(Props(new BookProgressActor(newFile, request.user, title)), uuid) ! "start"
+    val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "https://dictwitz.herokuapp.com/bookUpload")
+    Http().singleRequest(httpRequest) flatMap {
+      case response: HttpResponse =>
+        response.entity.toStrict(5 seconds).map(_.data.decodeString("UTF-8")).map(result =>
+            Ok(Json.parse(result))
+        )
+    }
     Ok(uuid);
   }
   }
