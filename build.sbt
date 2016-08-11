@@ -87,6 +87,13 @@ unmanagedJars in Compile ++= {
   customJars.classpath
 }
 
-resourceDirectories in Compile += baseDirectory.value / "lemmatizerResources"
+mappings in Universal ++= {
+  val resourcesDir = baseDirectory.value/"resources"
+  for {
+    file <- (resourcesDir ** AllPassFilter).get
+    relative <- file.relativeTo(resourcesDir.getParentFile)
+    mapping = file -> relative.getPath
+  } yield mapping
+}
 
 herokuAppName in Compile := "enigmatic-inlet-33873\nOpen app More "
