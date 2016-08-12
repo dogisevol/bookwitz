@@ -7,8 +7,8 @@ import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.pattern.ask
+import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import io.bookwitz.actors.BookProgressActor
 import io.bookwitz.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
 import io.bookwitz.models.{Book, BookWord}
 import io.bookwitz.users.models.BasicUser
@@ -18,6 +18,7 @@ import play.api.db.DB
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.mvc.MaxSizeExceeded
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
 import scala.concurrent.Future
@@ -35,7 +36,8 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
 
   val logger = Logger(getClass)
   var progressChannel: Concurrent.Channel[JsValue] = null
-
+  implicit val system = ActorSystem()
+  implicit val materializer = ActorMaterializer()
   def books = SecuredAction { request => {
     Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
       implicit val writes = Json.writes[Book]
@@ -64,21 +66,29 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
-  def bookUpload = SecuredAction { request => {
-    val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
-    val uuid = java.util.UUID.randomUUID().toString()
-    val file = request.body.asMultipartFormData.get.files.head.ref.file
-    val newFile = new File(file.getParentFile, uuid)
-    file.renameTo(newFile)
-    val title = request.body.asMultipartFormData.get.files.head.filename
-    val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "https://dictwitz.herokuapp.com/bookUpload")
-    Http().singleRequest(httpRequest) flatMap {
-      case response: HttpResponse =>
-        response.entity.toStrict(5 seconds).map(_.data.decodeString("UTF-8")).map(result =>
-            Ok(Json.parse(result))
-        )
+  def bookUpload = SecuredAction(parse.maxLength(5 * 1024 * 1024, parse.multipartFormData)) { request => {
+    request.body match {
+      case Left(MaxSizeExceeded(length)) => {
+        Logger.error("MaxSizeExceeded")
+        BadRequest("Your file is too large, we accept just " + length + " bytes!")
+      }
+      case Right(multipartForm) => {
+        val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
+        val uuid = java.util.UUID.randomUUID().toString()
+        val file = multipartForm.files.head.ref.file
+        val newFile = new File(file.getParentFile, uuid)
+        file.renameTo(newFile)
+        val title = multipartForm.files.head.filename
+        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "https://dictwitz.herokuapp.com/bookUpload")
+        Http().singleRequest(httpRequest) flatMap {
+          case response: HttpResponse =>
+            response.entity.toStrict(5 seconds).map(_.data.decodeString("UTF-8")).map(result =>
+              Ok(Json.parse(result))
+            )
+        }
+        Ok(uuid);
+      }
     }
-    Ok(uuid);
   }
   }
 
