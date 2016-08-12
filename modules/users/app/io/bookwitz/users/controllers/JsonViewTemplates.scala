@@ -1,13 +1,13 @@
 package io.bookwitz.users.controllers
 
 import play.api.data.Form
-import play.api.i18n.{Lang}
+import play.api.i18n.Lang
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.mvc.RequestHeader
 import play.api.templates._
 import securesocial.controllers.{ChangeInfo, RegistrationInfo, ViewTemplates}
-import io.bookwitz.users.models.UserTableQueries.mailTokens
+import play.twirl.api.Html
 
 
 object JsonViewTemplates extends ViewTemplates {
