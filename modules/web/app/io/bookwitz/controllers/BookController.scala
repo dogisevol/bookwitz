@@ -9,6 +9,7 @@ import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
 import io.bookwitz.users.models.BasicUser
+import io.bookwitz.web.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
 import io.bookwitz.web.models.{Book, BookWord}
 import play.api.Logger
 import play.api.Play.current

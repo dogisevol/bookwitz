@@ -1,5 +1,7 @@
 package io.bookwitz.web.models
 
+import io.bookwitz.web.models.BooksTableQueries.booksList
+
 import scala.language.higherKinds
 import scala.slick.driver.JdbcDriver.simple._
 

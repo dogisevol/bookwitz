@@ -1,5 +1,7 @@
 package io.bookwitz.web.models
 
+import io.bookwitz.web.models.BooksTableQueries.bookWordsList
+
 import scala.slick.driver.JdbcDriver.simple._
 
 case class BookWord(bookId: Long, wordId: Long, tag: String, freq: Long) {
