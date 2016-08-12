@@ -2,7 +2,7 @@
 
 requirejs.config(
   paths:
-    'angular': ['../lib/angularjs/angular2'],
+    'angular': ['../lib/angularjs/angular'],
     'angular-resource': ['../lib/angularjs/angular-resource'],
     'angular-route': ['../lib/angularjs/angular-route'],
     'angular-file-upload': ['../lib/angular-file-upload/ng-file-upload.min'],
