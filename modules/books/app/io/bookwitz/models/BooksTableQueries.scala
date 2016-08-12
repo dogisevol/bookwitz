@@ -8,8 +8,6 @@ object BooksTableQueries {
 
   object bookWordsList extends TableQuery(new BookWords(_))
 
-  object servicesList extends TableQuery(new WordServices(_))
-
   object dictionaryWordsList extends TableQuery(new WordDictionaries(_))
 
   object wordDefinitionsList extends TableQuery(new WordDefinitions(_))

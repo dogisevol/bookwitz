@@ -94,5 +94,3 @@ mappings in Universal ++= {
     mapping = file -> relative.getPath
   } yield mapping
 }
-
-herokuAppName in Compile := "enigmatic-inlet-33873\nOpen app More "
