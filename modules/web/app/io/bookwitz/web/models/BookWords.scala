@@ -1,6 +1,4 @@
-package io.bookwitz.models
-
-import io.bookwitz.models.BooksTableQueries.bookWordsList
+package io.bookwitz.web.models
 
 import scala.slick.driver.JdbcDriver.simple._
 

@@ -1,4 +1,4 @@
-package io.bookwitz.models
+package io.bookwitz.web.models
 
 import scala.language.higherKinds
 import scala.slick.driver.JdbcDriver.simple._

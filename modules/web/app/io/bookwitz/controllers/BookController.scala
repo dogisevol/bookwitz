@@ -1,6 +1,5 @@
 package io.bookwitz.controllers
 
-
 import java.io.File
 
 import akka.actor._
@@ -9,9 +8,8 @@ import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
 import akka.util.Timeout
-import io.bookwitz.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
-import io.bookwitz.models.{Book, BookWord}
 import io.bookwitz.users.models.BasicUser
+import io.bookwitz.web.models.{Book, BookWord}
 import play.api.Logger
 import play.api.Play.current
 import play.api.db.DB

@@ -16,18 +16,14 @@ resolvers in ThisBuild += Resolver.url("Edulify Repository", url("http://edulify
 
 lazy val web = (project in file("modules/web"))
   .enablePlugins(PlayScala)
-.dependsOn(books)
+.dependsOn(users)
 
 lazy val users = (project in file("modules/users"))
   .enablePlugins(PlayScala)
 
-lazy val books = (project in file("modules/books"))
-  .enablePlugins(PlayScala)
-  .dependsOn(users)
-
 lazy val bookwitz = (project in file("."))
   .enablePlugins(PlayScala)
-  .aggregate(web, users, books)
+  .aggregate(web, users)
   .dependsOn(web)
 
 libraryDependencies ++= Seq(

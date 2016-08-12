@@ -1,4 +1,4 @@
-package io.bookwitz.models
+package io.bookwitz.web.models
 
 import scala.slick.lifted.TableQuery
 
