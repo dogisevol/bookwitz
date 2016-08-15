@@ -4,9 +4,10 @@ import java.io.File
 
 import akka.actor._
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{HttpMethods, HttpRequest, HttpResponse}
+import akka.http.scaladsl.model._
 import akka.pattern.ask
 import akka.stream.ActorMaterializer
+import akka.stream.scaladsl.Source
 import akka.util.Timeout
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
@@ -37,6 +38,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   var progressChannel: Concurrent.Channel[JsValue] = null
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
+
   def books = SecuredAction { request => {
     Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
       implicit val writes = Json.writes[Book]
@@ -65,27 +67,47 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
-  def bookUpload = SecuredAction(parse.maxLength(5 * 1024 * 1024, parse.multipartFormData)) { request => {
+  def bookUpload = SecuredAction.async(parse.maxLength(5 * 1024 * 1024, parse.multipartFormData)) { request => {
     request.body match {
       case Left(MaxSizeExceeded(length)) => {
         Logger.error("MaxSizeExceeded")
-        BadRequest("Your file is too large, we accept just " + length + " bytes!")
+        Future(BadRequest("Your file is too large, we accept just " + length + " bytes!"))
       }
       case Right(multipartForm) => {
         val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
-        val uuid = java.util.UUID.randomUUID().toString()
         val file = multipartForm.files.head.ref.file
-        val newFile = new File(file.getParentFile, uuid)
+        val newFile = new File(file.getParentFile, java.util.UUID.randomUUID().toString())
         file.renameTo(newFile)
-        val title = multipartForm.files.head.filename
-        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "https://dictwitz.herokuapp.com/bookUpload")
-        Http().singleRequest(httpRequest) flatMap {
-          case response: HttpResponse =>
-            response.entity.toStrict(5 seconds).map(_.data.decodeString("UTF-8")).map(result =>
-              Ok(Json.parse(result))
-            )
+
+        val formData =
+          Multipart.FormData(
+            Source.single(
+              Multipart.FormData.BodyPart(
+                "file",
+                HttpEntity(ContentTypes.`text/plain(UTF-8)`, newFile, -1),
+                Map("filename" -> newFile.getName))))
+        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "https://dictwitz.herokuapp.com/bookUpload", entity = formData.toEntity())
+        val response = Http().singleRequest(httpRequest)
+        response onFailure {
+          case result =>
+            InternalServerError("failure")
         }
-        Ok(uuid);
+        response.flatMap(
+          response => {
+            val entity = response.entity.toStrict(5 seconds)
+            entity onFailure {
+              case result =>
+                InternalServerError("failure")
+            }
+
+            entity.flatMap(
+              entity => {
+                Future(Ok(Json.parse(entity.data.decodeString("UTF-8"))))
+              }
+            )
+          }
+        )
+
       }
     }
   }
@@ -95,7 +117,6 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     val actorPath: ActorPath = BookController.system / uuid
     val actorSelection = BookController.system.actorSelection(actorPath)
     val future = actorSelection.resolveOne(10 second)
-
     future onFailure {
       case actorRef => {
         InternalServerError("failure")
