@@ -27,7 +27,7 @@ lazy val bookwitz = (project in file("."))
   .dependsOn(web)
 
 libraryDependencies ++= Seq(
-  "org.webjars" %% "webjars-play" % "2.4.0",
+  "org.webjars" %% "webjars-play" % "2.3.0",
   "org.webjars" % "angularjs" % "1.5.7",
   "org.webjars" % "bootstrap" % "3.2.0",
   "org.webjars" % "requirejs" % "2.1.14-1",
