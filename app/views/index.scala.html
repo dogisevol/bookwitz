@@ -7,16 +7,13 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="">
 
+        <script type="application/javascript" src="@io.bookwitz.controllers.routes.Application.requireJsConfig()"></script>
+
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.versioned("images/favicon.png")">
         <link rel="stylesheet" media="screen" href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))" />
         <link rel="stylesheet" media="screen" href="@routes.Assets.versioned("web/stylesheets/stylesheet.css")"/>
         <link rel="stylesheet" media="screen" href="@routes.WebJarAssets.at(WebJarAssets.locate("ui-grid.css"))" />
 
-        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("ui-grid.js"))"></script>
-        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("angular.js"))"></script>
-        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("angular-resource.js"))"></script>
-        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("angular-route.js"))"></script>
-        <script src="@routes.WebJarAssets.at(WebJarAssets.locate("ng-file-upload.min.js"))"></script>
         <script data-main="@routes.Assets.versioned("javascripts/app.js")" src="@routes.WebJarAssets.at(WebJarAssets.locate("require.js"))"></script>
     </head>
     <body>

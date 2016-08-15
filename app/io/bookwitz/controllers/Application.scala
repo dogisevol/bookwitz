@@ -1,10 +1,10 @@
 package io.bookwitz.controllers
 
-import javax.inject.Inject
-
+import play.api.Play.current
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.{Navigation, NavigationItem, NavigationMenu}
 import play.api.Logger
+import play.api.cache.Cached
 import play.api.mvc.Action
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
@@ -12,6 +12,11 @@ import securesocial.core.{RuntimeEnvironment, SecureSocial}
 class Application(override implicit val env: RuntimeEnvironment[BasicUser]) extends SecureSocial[BasicUser] {
   val logger = Logger(getClass)
 
+  def requireJsConfig = Cached("require_js_config") {
+    Action {
+      Ok(views.html.requireJsConfig()).as("application/javascript")
+    }
+  }
 
   def index = Action {
     Ok(views.html.index())
