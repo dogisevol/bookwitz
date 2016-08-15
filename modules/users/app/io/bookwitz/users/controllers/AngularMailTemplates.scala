@@ -2,10 +2,9 @@ package io.bookwitz.users.controllers
 
 import play.api.i18n.Lang
 import play.api.mvc.RequestHeader
-import play.api.templates.{Html}
 import securesocial.controllers.MailTemplates
 import securesocial.core.BasicProfile
-import play.twirl.api.Txt
+import play.twirl.api.{Html, Txt}
 
 /**
   * @author Joseph Dessens

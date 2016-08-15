@@ -5,17 +5,16 @@ import play.api.i18n.Lang
 import play.api.libs.json.Json
 import play.api.libs.json.Json.JsValueWrapper
 import play.api.mvc.RequestHeader
-import play.api.templates._
 import securesocial.controllers.{ChangeInfo, RegistrationInfo, ViewTemplates}
 import play.twirl.api.Html
 
 
 object JsonViewTemplates extends ViewTemplates {
-  def toHtml(fields : (String, JsValueWrapper)): Html = {
+  def toHtml(fields: (String, JsValueWrapper)): Html = {
     Html(Json.stringify(Json.obj(fields)))
   }
 
-  def toHtmlRep(fields : (String, JsValueWrapper)):  play.twirl.api.Html = {
+  def toHtmlRep(fields: (String, JsValueWrapper)): play.twirl.api.Html = {
     play.twirl.api.Html(Json.stringify(Json.obj(fields)))
   }
 
@@ -24,7 +23,7 @@ object JsonViewTemplates extends ViewTemplates {
   }
 
   override def getLoginPage(form: Form[(String, String)], msg: Option[String] = None)(implicit request: RequestHeader, lang: Lang): Html = {
-    msg.map(message => toHtml("message" -> play.api.i18n.Messages(message)(lang))).getOrElse(processForm(form))
+    processForm(form)
   }
 
   override def getSignUpPage(form: Form[RegistrationInfo], token: String)(implicit request: RequestHeader, lang: Lang): Html = {
