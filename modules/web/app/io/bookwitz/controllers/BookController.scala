@@ -76,6 +76,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
       case Right(multipartForm) => {
         val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
         val file = multipartForm.files.head.ref.file
+        scala.io.Source.fromFile(file).mkString
         val newFile = new File(file.getParentFile, java.util.UUID.randomUUID().toString())
         file.renameTo(newFile)
 
@@ -83,10 +84,10 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
           Multipart.FormData(
             Source.single(
               Multipart.FormData.BodyPart(
-                "file",
-                HttpEntity(ContentTypes.`text/plain(UTF-8)`, newFile, -1),
+                "content",
+                HttpEntity(scala.io.Source.fromFile(file).mkString),
                 Map("filename" -> newFile.getName))))
-        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "https://dictwitz.herokuapp.com/bookUpload", entity = formData.toEntity())
+        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "http://localhost:8080/bookUpload", entity = formData.toEntity())
         val response = Http().singleRequest(httpRequest)
         response onFailure {
           case result =>
