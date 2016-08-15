@@ -15,4 +15,6 @@ addSbtPlugin("com.typesafe.sbt" % "sbt-gzip" % "1.0.0")
 
 addSbtPlugin("com.heroku" % "sbt-heroku" % "0.1.5")
 
+addSbtPlugin("com.typesafe.sbt" % "sbt-rjs" % "1.0.7")
+
 logLevel := Level.Debug
