@@ -29,6 +29,8 @@ object BookController {
 
 class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) extends SecureSocial[BasicUser] {
 
+  val PARSER_URI: String = "http://dictwitz.herokuapp.com/bookUpload"
+
   val logger = Logger(getClass)
   var progressChannel: Concurrent.Channel[JsValue] = null
   implicit val system = ActorSystem()
@@ -71,7 +73,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
       case Right(multipartForm) => {
         val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
         val file = multipartForm.files.head.ref.file
-        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "http://localhost:8080/bookUpload",
+        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = PARSER_URI,
           entity = FormData("content" -> scala.io.Source.fromFile(file).mkString, "title" -> file.getName).toEntity)
         val response = Http().singleRequest(httpRequest)
         response onFailure {
@@ -111,7 +113,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   def bookProcessProgress(uuid: String) = SecuredAction.async { request => {
 
     val httpRequest = HttpRequest(method = HttpMethods.GET,
-      uri = Uri("http://localhost:8080/bookUpload").withQuery(Uri.Query("uuid" -> uuid)))
+      uri = Uri(PARSER_URI).withQuery(Uri.Query("uuid" -> uuid)))
     val response = Http().singleRequest(httpRequest)
     response onFailure {
       case result =>
