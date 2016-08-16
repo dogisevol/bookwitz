@@ -29,7 +29,7 @@ object BookController {
 
 class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) extends SecureSocial[BasicUser] {
 
-  val PARSER_URI: String = "http://dictwitz.herokuapp.com/bookUpload"
+  val PARSER_URI: String = "https://dictwitz.herokuapp.com/bookUpload"
 
   val logger = Logger(getClass)
   var progressChannel: Concurrent.Channel[JsValue] = null
