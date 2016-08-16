@@ -1,14 +1,9 @@
 package io.bookwitz.controllers
 
-import java.io.File
-
 import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
-import akka.pattern.ask
 import akka.stream.ActorMaterializer
-import akka.stream.scaladsl.Source
-import akka.util.Timeout
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
 import io.bookwitz.web.models.{Book, BookWord}
@@ -67,30 +62,21 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
-  def bookUpload = SecuredAction.async(parse.maxLength(5 * 1024 * 1024, parse.multipartFormData)) { request => {
+  def bookUpload = SecuredAction.async(parse.maxLength(1024 * 1024, parse.multipartFormData)) { request => {
     request.body match {
       case Left(MaxSizeExceeded(length)) => {
-        Logger.error("MaxSizeExceeded")
+        logger.error("Progress response error. File is too large " + length )
         Future(BadRequest("Your file is too large, we accept just " + length + " bytes!"))
       }
       case Right(multipartForm) => {
         val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
         val file = multipartForm.files.head.ref.file
-        scala.io.Source.fromFile(file).mkString
-        val newFile = new File(file.getParentFile, java.util.UUID.randomUUID().toString())
-        file.renameTo(newFile)
-
-        val formData =
-          Multipart.FormData(
-            Source.single(
-              Multipart.FormData.BodyPart(
-                "content",
-                HttpEntity(scala.io.Source.fromFile(file).mkString),
-                Map("filename" -> newFile.getName))))
-        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "http://localhost:8080/bookUpload", entity = formData.toEntity())
+        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = "http://localhost:8080/bookUpload",
+          entity = FormData("content" -> scala.io.Source.fromFile(file).mkString, "title" -> file.getName).toEntity)
         val response = Http().singleRequest(httpRequest)
         response onFailure {
           case result =>
+            logger.error("Progress response error ", result)
             InternalServerError("failure")
         }
         response.flatMap(
@@ -98,12 +84,20 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
             val entity = response.entity.toStrict(5 seconds)
             entity onFailure {
               case result =>
+                logger.error("Progress response error ", result)
                 InternalServerError("failure")
             }
 
             entity.flatMap(
               entity => {
-                Future(Ok(Json.parse(entity.data.decodeString("UTF-8"))))
+                if (response.status.isSuccess()) {
+                  val uuid = entity.data.decodeString("UTF-8")
+                  logger.debug("Upload response " + uuid)
+                  Future(Ok(uuid))
+                } else {
+                  logger.error("Progress response error " + response.status.reason())
+                  Future(InternalServerError("failure"))
+                }
               }
             )
           }
@@ -115,26 +109,30 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
 
   def bookProcessProgress(uuid: String) = SecuredAction.async { request => {
-    val actorPath: ActorPath = BookController.system / uuid
-    val actorSelection = BookController.system.actorSelection(actorPath)
-    val future = actorSelection.resolveOne(10 second)
-    future onFailure {
-      case actorRef => {
-        InternalServerError("failure")
-      }
-    }
 
-    future.flatMap(
+    val httpRequest = HttpRequest(method = HttpMethods.GET,
+      uri = Uri("http://localhost:8080/bookUpload").withQuery(Uri.Query("uuid" -> uuid)))
+    val response = Http().singleRequest(httpRequest)
+    response onFailure {
+      case result =>
+        logger.error("Progress response error", result)
+        InternalServerError("failure")
+    }
+    response.flatMap(
       response => {
-        implicit val timeout = Timeout(5 seconds)
-        val askFuture: Future[String] = ask(response, "progress").mapTo[String]
-        askFuture.onFailure {
+        val entity = response.entity.toStrict(5 seconds)
+        entity onFailure {
           case result =>
-            InternalServerError("failure");
+            logger.error("Progress response error", result)
+            InternalServerError("failure")
         }
-        askFuture.map(
-          message =>
-            Ok(message.toString)
+
+        entity.flatMap(
+          entity => {
+            val text = entity.data.decodeString("UTF-8")
+            logger.debug("Progress response " + text)
+            Future(Ok(Json.parse(text)))
+          }
         )
       }
     )

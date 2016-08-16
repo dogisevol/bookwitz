@@ -61,24 +61,25 @@ define(['angular'], (angular) ->
             $scope.progressFile = (file, uuid) ->
                 $http.get('web/bookUpload', {params: {'uuid': uuid}})
                 .success (response) ->
-                    if response.progress < 0
+                    if response.status = 'failure'
                         $scope.errorMsg = response.status
+                        return
                     else
-                        if response.progress < 100
+                        if response.status == 'done'
+                            file.progress = 100
+                            $scope.wordsGridOptions.data = file.data
+                            return
+                        else
                             file.progress = response.progress
                             file.operation = response.status
                             $timeout (->
                               $scope.progressFile(file, uuid)
                               return
                             ), 1000
-                        else
-                            file.progress = 100
-                            return
                 .error (response) ->
                     $scope.errorMsg = response.status
             $scope.uploadFiles = (file, errFiles) ->
               $scope.f = file
-              file.operation = 'Uploading'
               $scope.errFile = errFiles and errFiles[0]
               if file
                 file.upload = Upload.upload(
