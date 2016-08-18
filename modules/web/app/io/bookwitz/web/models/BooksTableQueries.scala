@@ -6,7 +6,7 @@ object BooksTableQueries {
 
   object booksList extends TableQuery(new Books(_))
 
-  object bookWordsList extends TableQuery(new BookWords(_))
+  object userWordsList extends TableQuery(new UserWords(_))
 
   object dictionaryWordsList extends TableQuery(new WordDictionaries(_))
 

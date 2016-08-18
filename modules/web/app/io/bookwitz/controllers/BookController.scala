@@ -5,15 +5,15 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.BooksTableQueries.{bookWordsList, booksList, dictionaryWordsList}
-import io.bookwitz.web.models.{Book, BookWord}
+import io.bookwitz.web.models.BooksTableQueries.{booksList, userWordsList}
+import io.bookwitz.web.models.{Book, UserWord}
 import play.api.Logger
 import play.api.Play.current
 import play.api.db.DB
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.Concurrent
 import play.api.libs.json.{JsValue, Json, Writes}
-import play.api.mvc.MaxSizeExceeded
+import play.api.mvc.{MaxSizeExceeded, Result}
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
 import scala.concurrent.Future
@@ -23,7 +23,6 @@ import scala.slick.driver.JdbcDriver.simple._
 
 
 object BookController {
-  val system = ActorSystem("process")
 }
 
 
@@ -32,7 +31,6 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   val PARSER_URI: String = "https://dictwitz.herokuapp.com/bookUpload"
 
   val logger = Logger(getClass)
-  var progressChannel: Concurrent.Channel[JsValue] = null
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
 
@@ -51,60 +49,31 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     }
   }
 
-  def bookWords(bookId: Long) = SecuredAction { request => {
+  def userWords() = SecuredAction { request => {
     Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
-      implicit val writes = Json.writes[BookWord]
-
-
-      val innerJoin = for {
-        (b, d) <- bookWordsList join dictionaryWordsList on (_.word === _.id)
-      } yield (b.bookId, d.word, b.tagColumn, b.freq)
-      Ok(Json.stringify(Json.toJson(innerJoin.filter(_._1 === bookId).list)))
+      implicit val writes = Json.writes[UserWord]
+      Ok(userWordsList.filter(_.userId == request.user.main.userId).list)
     }
+  }
+  }
+
+
+  //TODO
+  def contentUpload = SecuredAction.async(parse.json(maxLength = 1024 * 1024)) { request => {
+    forwardUpload(request.body.\("content").as[String])
   }
   }
 
   def bookUpload = SecuredAction.async(parse.maxLength(1024 * 1024, parse.multipartFormData)) { request => {
     request.body match {
       case Left(MaxSizeExceeded(length)) => {
-        logger.error("Progress response error. File is too large " + length )
+        logger.error("Progress response error. File is too large " + length)
         Future(BadRequest("Your file is too large, we accept just " + length + " bytes!"))
       }
       case Right(multipartForm) => {
         val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
         val file = multipartForm.files.head.ref.file
-        val httpRequest = HttpRequest(method = HttpMethods.POST, uri = PARSER_URI,
-          entity = FormData("content" -> scala.io.Source.fromFile(file).mkString, "title" -> file.getName).toEntity)
-        val response = Http().singleRequest(httpRequest)
-        response onFailure {
-          case result =>
-            logger.error("Progress response error ", result)
-            InternalServerError("failure")
-        }
-        response.flatMap(
-          response => {
-            val entity = response.entity.toStrict(5 seconds)
-            entity onFailure {
-              case result =>
-                logger.error("Progress response error ", result)
-                InternalServerError("failure")
-            }
-
-            entity.flatMap(
-              entity => {
-                if (response.status.isSuccess()) {
-                  val uuid = entity.data.decodeString("UTF-8")
-                  logger.debug("Upload response " + uuid)
-                  Future(Ok(uuid))
-                } else {
-                  logger.error("Progress response error " + response.status.reason())
-                  Future(InternalServerError("failure"))
-                }
-              }
-            )
-          }
-        )
-
+        forwardUpload(scala.io.Source.fromFile(file).mkString)
       }
     }
   }
@@ -139,5 +108,39 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
       }
     )
   }
+  }
+
+  def forwardUpload(content: String): Future[Result] = {
+    val httpRequest = HttpRequest(method = HttpMethods.POST, uri = PARSER_URI,
+      entity = FormData("content" -> content).toEntity)
+    val response = Http().singleRequest(httpRequest)
+    response onFailure {
+      case result =>
+        logger.error("Progress response error ", result)
+        InternalServerError("failure")
+    }
+    response.flatMap(
+      response => {
+        val entity = response.entity.toStrict(5 seconds)
+        entity onFailure {
+          case result =>
+            logger.error("Progress response error ", result)
+            InternalServerError("failure")
+        }
+
+        entity.flatMap(
+          entity => {
+            if (response.status.isSuccess()) {
+              val uuid = entity.data.decodeString("UTF-8")
+              logger.debug("Upload response " + uuid)
+              Future(Ok(uuid))
+            } else {
+              logger.error("Progress response error " + response.status.reason())
+              Future(InternalServerError("failure"))
+            }
+          }
+        )
+      }
+    )
   }
 }

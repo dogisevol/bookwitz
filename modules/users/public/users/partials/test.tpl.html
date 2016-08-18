@@ -1,16 +1,15 @@
-<bookwitz-header h1="Books"></bookwitz-header>
-<div ng-controller="BooksController as test">
-    <div ui-grid="gridOptions" ui-grid-selection ui-grid-pagination class="booksGrid"></div>
+<bookwitz-header h2="Books upload"></bookwitz-header>
+<div ng-controller="BooksController">
     <div ng-app="fileUpload" ng-controller="BookUploadController as bookUpload">
+        <textarea ng-model="content"></textarea>
+        <button type="button" ng-click="uploadText()"
+                class="btn btn-success">
+            Process text
+        </button>
         <button type="button" ngf-select="uploadFiles($file, $invalidFiles)"
                 accept="plain/text" ngf-max-height="100000" ngf-max-size="1MB" class="btn btn-success">
-            Add book
+            Upload file
         </button>
-        <button type="button" class="btn btn-success" ng-click="toggleMultiSelect()">Delete</button>
-        <button type="button" class="btn btn-success" ng-click="hideWordsGrid = !hideWordsGrid">
-            Show words
-        </button>
-        <br><br>
         File:
         <div style="font:smaller">{{f.operation}}{{f.name}} {{errFile.name}} {{errFile.$error}} {{errFile.$errorParam}}
   <span class="progress" ng-show="f.progress >= 0">

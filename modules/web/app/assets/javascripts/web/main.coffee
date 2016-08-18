@@ -31,13 +31,6 @@ define(['angular'], (angular) ->
               { "name":"userId", "field": "userId" }
             ]
 
-        $scope.gridOptions.onRegisterApi = (gridApi) ->
-                gridApi.selection.on.rowSelectionChanged($scope, (row) ->
-                     $http.get('web/bookWords', {params: {'uuid': row.entity.id}})
-                        .then ((response) ->
-                            $scope.wordsGridOptions.data = response.data
-                        )
-                )
         $scope.wordsGridOptions =
             "enableSorting": true,
             "multiSelect": false,
@@ -57,6 +50,21 @@ define(['angular'], (angular) ->
     class BookUploadController
           constructor: ($scope, Upload, $timeout, $http) ->
             $scope.file = {} if $scope.file is undefined
+
+            $scope.uploadText = (file) ->
+                $http.post('web/contentUpload', {'content': $scope.content})
+                .success (response) ->
+                    if response.status == 'failure'
+                        $scope.errorMsg = response.status
+                        return
+                    else
+                        $timeout (->
+                          $scope.progressFile($scope.file, response)
+                          return
+                        ), 1000
+                .error (response) ->
+                    $scope.errorMsg = response.status
+
 
             $scope.progressFile = (file, uuid) ->
                 $http.get('web/bookUpload', {params: {'uuid': uuid}})

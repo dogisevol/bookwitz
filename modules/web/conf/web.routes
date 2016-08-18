@@ -3,5 +3,6 @@ GET        /assets/*file         controllers.Assets.at(path="/public/web", file)
 GET        /navigation           @io.bookwitz.controllers.MainController.navigation
 POST       /bookUpload                @io.bookwitz.controllers.BookController.bookUpload
 GET       /books                @io.bookwitz.controllers.BookController.books
-GET       /bookWords                @io.bookwitz.controllers.BookController.bookWords(uuid: Long)
 GET       /bookUpload                @io.bookwitz.controllers.BookController.bookProcessProgress(uuid: String)
+GET       /userWords                @io.bookwitz.controllers.BookController.userWords
+POST       /contentUpload                @io.bookwitz.controllers.BookController.contentUpload
