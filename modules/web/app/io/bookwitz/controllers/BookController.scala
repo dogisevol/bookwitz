@@ -52,9 +52,16 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     }
   }
 
-  def userWords() = SecuredAction { request => {
+  def userWords() = SecuredAction.async { request => {
     val words = wordsService.getUserWords(request.user)
-
+    words.onFailure {
+      case result =>
+        InternalServerError("failure");
+    }
+    words.map(
+      message =>
+        Ok(message)
+    )
   }
   }
 
