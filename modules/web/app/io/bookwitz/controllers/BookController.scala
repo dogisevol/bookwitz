@@ -4,9 +4,11 @@ import akka.actor._
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
+import io.bookwitz.service.WordsService
+import io.bookwitz.service.slick.SlickWordsService
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.BooksTableQueries.{booksList, userWordsList}
-import io.bookwitz.web.models.{Book, UserWord}
+import io.bookwitz.web.models.Book
+import io.bookwitz.web.models.BooksTableQueries.booksList
 import play.api.Logger
 import play.api.Play.current
 import play.api.db.DB
@@ -21,7 +23,6 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.slick.driver.JdbcDriver.simple._
 
-
 object BookController {
 }
 
@@ -33,6 +34,8 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   val logger = Logger(getClass)
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
+  val wordsService: WordsService = new SlickWordsService
+
 
   def books = SecuredAction { request => {
     Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
@@ -50,10 +53,8 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
 
   def userWords() = SecuredAction { request => {
-    Database.forDataSource(DB.getDataSource()) withSession { implicit session =>
-      implicit val writes = Json.writes[UserWord]
-      Ok(userWordsList.filter(_.userId == request.user.main.userId).list)
-    }
+    val words = wordsService.getUserWords(request.user)
+
   }
   }
 
