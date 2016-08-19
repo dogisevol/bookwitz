@@ -11,8 +11,6 @@ define(['angular'], (angular) ->
         templateUrl: 'users/vassets/partials/home.tpl.html'
       $routeProvider.when '/login',
         templateUrl: 'users/vassets/partials/login.tpl.html'
-      #$routeProvider.when '/logout',
-      #  resolve:
       $routeProvider.when '/signup',
         templateUrl: 'users/vassets/partials/signup-start.tpl.html'
       $routeProvider.when '/signup/:token',
@@ -29,7 +27,7 @@ define(['angular'], (angular) ->
 
   users.factory 'navigation',
     ($resource) ->
-      $resource('navigation')
+      $resource('user/navigation')
 
   users.factory 'home',
     ($resource) ->
