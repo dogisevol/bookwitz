@@ -26,8 +26,8 @@ class Application(override implicit val env: RuntimeEnvironment[BasicUser]) exte
     request.user match {
       case Some(user) => {
         Ok(Navigation("default", menus = Seq(
-          NavigationMenu(items = Seq(NavigationItem("Change Password", "#/password")), position = "left"),
-          NavigationMenu(items = Seq(NavigationItem("BookParser", "#/test")), position = "left"),
+          NavigationMenu(items = Seq(NavigationItem("Books", "#/books")), position = "left"),
+          NavigationMenu(items = Seq(NavigationItem("Profile", "#/password")), position = "left"),
           NavigationMenu(items = Seq(NavigationItem("Sign Out", "#/users/logout")), position = "right")
         )).json)
       }

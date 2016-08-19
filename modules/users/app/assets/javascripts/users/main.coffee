@@ -23,8 +23,6 @@ define(['angular'], (angular) ->
         templateUrl: 'users/vassets/partials/reset.tpl.html'
       $routeProvider.when '/password',
         templateUrl: 'users/vassets/partials/password.tpl.html'
-      $routeProvider.when '/test',
-        templateUrl: 'users/vassets/partials/test.tpl.html'
       $routeProvider.otherwise
         redirectTo: '/home'
   ]

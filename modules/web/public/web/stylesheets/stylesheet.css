@@ -68,3 +68,7 @@ body {
      background: orange;
      width: 0;
  }
+
+ .contentArea{
+    width: 100%
+ }

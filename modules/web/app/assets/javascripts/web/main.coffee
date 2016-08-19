@@ -4,9 +4,18 @@ define(['angular'], (angular) ->
 
   web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection'])
 
+  web.config [
+    '$routeProvider',
+    ($routeProvider) ->
+      $routeProvider.when '/books',
+        templateUrl: 'web/vassets/partials/books.tpl.html'
+      $routeProvider.otherwise
+        redirectTo: '/books'
+  ]
+
   web.factory 'navigation',
-      ($resource) ->
-        $resource('web/navigation')
+    ($resource) ->
+      $resource('web/navigation')
 
   web.controller 'BooksController',
     class BooksController
@@ -141,7 +150,7 @@ define(['angular'], (angular) ->
       value: '@'
     templateUrl: 'web/vassets/partials/button.tpl.html'
 
-  web.directive 'bookwitzHeader', ->
+  web.directive 'bookHeader', ->
     restrict: 'E'
     scope:
       h1: '@'
@@ -153,7 +162,7 @@ define(['angular'], (angular) ->
     templateUrl: 'web/vassets/partials/header.tpl.html'
     transclude: true
 
-  web.directive 'bookwitzNav', ->
+  web.directive 'bookNav', ->
     restrict: 'E'
     scope:
       module: '@'

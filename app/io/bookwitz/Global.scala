@@ -9,6 +9,7 @@ import securesocial.core.authenticator.{CookieAuthenticatorBuilder, HttpHeaderAu
 import securesocial.core.services.{AuthenticatorService, UserService}
 
 object Global extends play.api.GlobalSettings {
+
   object MyRuntimeEnvironment extends RuntimeEnvironment.Default[BasicUser] {
     override val userService: UserService[BasicUser] = new SlickUserService
     override lazy val authenticatorService: AuthenticatorService[BasicUser] = new AuthenticatorService[BasicUser](
@@ -18,7 +19,7 @@ object Global extends play.api.GlobalSettings {
   }
 
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
-    val instance  = controllerClass.getConstructors.find { c =>
+    val instance = controllerClass.getConstructors.find { c =>
       val params = c.getParameterTypes
       params.length == 1 && params(0) == classOf[RuntimeEnvironment[BasicUser]]
     }.map {

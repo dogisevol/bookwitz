@@ -30,10 +30,31 @@ require([
     '$routeProvider',
     ($routeProvider) ->
       $routeProvider.when '/',
-        templateUrl: 'users/vassets/partials/home.tpl.html'
+        templateUrl: 'vassets/partials/welcome.tpl.html'
       $routeProvider.otherwise
         redirectTo: '/'
   ]
+
+  bookwitz.directive 'bookwitzHeader', ->
+    restrict: 'E'
+    scope:
+      h1: '@'
+      h2: '@'
+      lead: '@'
+      subtext: '@'
+      navModule: '@'
+      navService: '@'
+    templateUrl: 'vassets/partials/header.tpl.html'
+    transclude: true
+
+  bookwitz.directive 'bookwitzNav', ->
+    restrict: 'E'
+    scope:
+      module: '@'
+      service: '@'
+    templateUrl: 'vassets/partials/navigation.tpl.html'
+    link: ($scope) ->
+      $scope.data = angular.injector([$scope.module]).get($scope.service).get(() -> $scope.$apply())
 
   angular.bootstrap(document, ['bookwitz']);
 )

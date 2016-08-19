@@ -4,7 +4,8 @@ import io.bookwitz.service.WordsService
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.BooksTableQueries.userWordsList
 import play.api.Logger
-import play.api.db.slick._
+import play.api.Play.current
+import play.api.db.slick.DB
 import securesocial.core.providers.{UsernamePasswordProvider => UserPass}
 
 import scala.concurrent.Future

@@ -6,9 +6,9 @@ case class UserWord(userId: String, word: String) {
 }
 
 class UserWords(tag: Tag) extends Table[UserWord](tag, "user_words") {
-  def userId = column[Long]("userId", O.PrimaryKey)
+  def userId = column[String]("userId", O.PrimaryKey)
 
-  def word = column[Long]("word")
+  def word = column[String]("word")
 
   def * = (userId, word) <> (UserWord.tupled, UserWord.unapply)
 }

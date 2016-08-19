@@ -1,7 +1,7 @@
-<bookwitz-header h2="Books upload"></bookwitz-header>
+<book-header h2="Books upload"></book-header>
 <div ng-controller="BooksController">
     <div ng-app="fileUpload" ng-controller="BookUploadController as bookUpload">
-        <textarea ng-model="content"></textarea>
+        <textarea class="contentArea" ng-model="content"></textarea>
         <button type="button" ng-click="uploadText()"
                 class="btn btn-success">
             Process text

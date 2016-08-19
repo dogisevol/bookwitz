@@ -14,7 +14,7 @@ import play.api.Play.current
 import play.api.db.DB
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.Concurrent
-import play.api.libs.json.{JsValue, Json, Writes}
+import play.api.libs.json._
 import play.api.mvc.{MaxSizeExceeded, Result}
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
@@ -46,12 +46,6 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
 
 
-  implicit val writer = new Writes[(Long, String, String, Long)] {
-    def writes(t: (Long, String, String, Long)): JsValue = {
-      Json.obj("bookId" -> t._1, "word" -> t._2, "tag" -> t._3, "freq" -> t._4)
-    }
-  }
-
   def userWords() = SecuredAction.async { request => {
     val words = wordsService.getUserWords(request.user)
     words.onFailure {
@@ -60,7 +54,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     }
     words.map(
       message =>
-        Ok(message)
+        Ok(Json.toJson(message))
     )
   }
   }
