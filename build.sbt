@@ -13,7 +13,8 @@ homepage := Some(url("https://blablabla"))
 licenses := Seq("GNU AFFERO GENERAL PUBLIC LICENSE, Version 3" -> url("http://www.gnu.org/licenses/agpl-3.0.txt"))
 
 resolvers in ThisBuild += Resolver.url("Edulify Repository", url("http://edulify.github.io/modules/releases/"))(Resolver.ivyStylePatterns)
-resolvers += "mandubian maven bintray" at "http://dl.bintray.com/mandubian/maven"
+resolvers += Resolver.url("mandubian maven bintray", url("http://dl.bintray.com/mandubian/maven/"))
+//resolvers += "mandubian maven bintray" at "http://dl.bintray.com/mandubian/maven"
 
 lazy val web = (project in file("modules/web"))
   .enablePlugins(PlayScala)

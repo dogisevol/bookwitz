@@ -118,7 +118,6 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
                   logger.debug(item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String]))).toString())
               )
 
-            value.se
 
               logger.debug(value.toString())
             }
