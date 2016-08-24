@@ -8,4 +8,6 @@ trait WordsService {
 
   def getUserWords(user: BasicUser): Future[List[String]]
 
+  def containsWord(user: BasicUser, word: String): Boolean
+
 }

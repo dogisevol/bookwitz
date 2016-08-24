@@ -14,6 +14,7 @@ import play.api.Play.current
 import play.api.db.DB
 import play.api.libs.concurrent.Execution.Implicits._
 import play.api.libs.iteratee.Concurrent
+import play.api.libs.json.Reads._
 import play.api.libs.json._
 import play.api.mvc.{MaxSizeExceeded, Result}
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
@@ -22,6 +23,10 @@ import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.slick.driver.JdbcDriver.simple._
+import play.api.libs.json._
+import play.api.libs.json.monad.syntax._
+import play.api.libs.json.
+import com.github.tototoshi
 
 object BookController {
 }
@@ -81,6 +86,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
+
   def bookProcessProgress(uuid: String) = SecuredAction.async { request => {
 
     val httpRequest = HttpRequest(method = HttpMethods.GET,
@@ -104,7 +110,20 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
           entity => {
             val text = entity.data.decodeString("UTF-8")
             logger.debug("Progress response " + text)
-            Future(Ok(Json.parse(text)))
+            var value = Json.parse(text)
+            if ("done".equals(value.\("status").as[String])) {
+              var list = JsArray()
+              value.\("data").as[JsArray].value.map(
+                item =>
+                  //list :+ item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])))
+                  logger.debug(item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String]))).toString())
+              )
+
+            value.se
+
+              logger.debug(value.toString())
+            }
+            Future(Ok(value))
           }
         )
       }

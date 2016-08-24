@@ -20,4 +20,11 @@ class SlickWordsService extends WordsService {
         .filter(sp => sp.userId === user.main.userId).list.map(p => p.word)
     }
   }
+
+  override def containsWord(user: BasicUser, word: String): Boolean = {
+    DB withSession { implicit session =>
+      userWordsList
+        .filter(sp => sp.word === word).list.length == 1
+    }
+  }
 }

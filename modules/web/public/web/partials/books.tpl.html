@@ -4,12 +4,14 @@
         <textarea class="contentArea" ng-model="content"></textarea>
         <button type="button" ng-click="uploadText()"
                 class="btn btn-success">
-            Process text
+            Insert text
         </button>
+        <br>or<br>
         <button type="button" ngf-select="uploadFiles($file, $invalidFiles)"
                 accept="plain/text" ngf-max-height="100000" ngf-max-size="1MB" class="btn btn-success">
             Upload file
         </button>
+        <br>
         File:
         <div style="font:smaller">{{f.operation}}{{f.name}} {{errFile.name}} {{errFile.$error}} {{errFile.$errorParam}}
   <span class="progress" ng-show="f.progress >= 0">
@@ -18,6 +20,7 @@
   </span>
         </div>
         {{errorMsg}}
+        <br>
         <div class="well" ng-hide="hideWordsGrid">
             <div ui-grid="wordsGridOptions" ui-grid-selection ui-grid-pagination class="grid"></div>
         </div>
