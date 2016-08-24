@@ -24,9 +24,8 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.slick.driver.JdbcDriver.simple._
 import play.api.libs.json._
-import play.api.libs.json.monad.syntax._
-import play.api.libs.json.
-import com.github.tototoshi
+//import play.api.libs.json.monad.syntax._
+//import play.api.libs.json.
 
 object BookController {
 }
