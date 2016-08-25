@@ -19,13 +19,11 @@ import play.api.libs.json._
 import play.api.mvc.{MaxSizeExceeded, Result}
 import securesocial.core.{RuntimeEnvironment, SecureSocial}
 
+import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
 import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.slick.driver.JdbcDriver.simple._
-import play.api.libs.json._
-
-import scala.collection.mutable.ListBuffer
 
 object BookController {
 }
@@ -64,9 +62,24 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
 
 
-  //TODO
   def contentUpload = SecuredAction.async(parse.json(maxLength = 1024 * 1024)) { request => {
     forwardUpload(request.body.\("content").as[String])
+  }
+  }
+
+  def addUserWords = SecuredAction(parse.json(maxLength = 1024 * 1024)) { request => {
+    request.body.\\("word").foreach(
+      word =>
+        try {
+          wordsService.addWord(word.as[String], request.user)
+        } catch {
+          case e: Exception => {
+            logger.error("Cannot add user word", e)
+            InternalServerError
+          }
+        }
+    )
+    Ok
   }
   }
 
@@ -109,24 +122,30 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
           entity => {
             val text = entity.data.decodeString("UTF-8")
             logger.debug("Progress response " + text)
-            var value = Json.parse(text)
-            if ("done".equals(value.\("status").as[String])) {
-              var list = ListBuffer[JsValue]()
-              value.\("data").as[JsArray].value.map(
-                item =>
-                  if (!wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])) {
-                    list += item
-                  }
-                //list :+ item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])))
-              )
+            try {
+              var value = Json.parse(text)
+              if ("done".equals(value.\("status").as[String])) {
+                var list = ListBuffer[JsValue]()
+                value.\("data").as[JsArray].value.map(
+                  item =>
+                    if (!wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])) {
+                      list += item
+                    }
+                  //list :+ item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])))
+                )
 
-              value = value.transform((__).json.update(
-                __.read[JsObject].map { o => o ++ Json.obj("data" -> JsArray(list)) }
-              )).asOpt.get
+                value = value.transform((__).json.update(
+                  __.read[JsObject].map { o => o ++ Json.obj("data" -> JsArray(list)) }
+                )).asOpt.get
 
-              logger.debug(value.toString())
+                logger.debug(value.toString())
+              }
+              Future(Ok(value))
+            } catch {
+              case e: Exception =>
+                logger.error("cannot parse the response", e)
+                Future(InternalServerError("failure"))
             }
-            Future(Ok(value))
           }
         )
       }

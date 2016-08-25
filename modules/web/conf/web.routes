@@ -6,3 +6,5 @@ GET       /books                @io.bookwitz.controllers.BookController.books
 GET       /bookUpload                @io.bookwitz.controllers.BookController.bookProcessProgress(uuid: String)
 GET       /userWords                @io.bookwitz.controllers.BookController.userWords
 POST       /contentUpload                @io.bookwitz.controllers.BookController.contentUpload
+POST       /addUserWords                @io.bookwitz.controllers.BookController.addUserWords
+

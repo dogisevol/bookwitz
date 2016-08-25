@@ -22,7 +22,10 @@
         {{errorMsg}}
         <br>
         <div class="well" ng-hide="hideWordsGrid">
-            <div ui-grid="wordsGridOptions" ui-grid-selection ui-grid-pagination class="grid"></div>
+            <div ui-grid="gridOptions" ui-grid-selection ui-grid-pagination  ui-grid-exporter class="grid"></div>
+            <button type="button" ng-click="sendSelected()" class="btn btn-success">
+                Add as known
+            </button>
         </div>
     </div>
 </div>

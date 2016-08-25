@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection', 'ui.grid.exporter'])
 
   web.config [
     '$routeProvider',
@@ -20,38 +20,38 @@ define(['angular'], (angular) ->
   web.controller 'BooksController',
     class BooksController
       constructor: ($scope, $http, $location) ->
-        $http.get('/web/books')
-                     .success (response) ->
-                       $scope.gridOptions.data = response
-
         $scope.gridOptions =
-            "enableSorting": true
-            "multiSelect": false
-            "modifierKeysToMultiSelect": false
-            "enableRowHeaderSelection": false
-            "noUnselect": true
-            "enableRowSelection": true
-            "enableSelectAll": false
-            "rowHeight": 35
-            "showGridFooter":true
-            "columnDefs": [
-              { "name":"book", "field": "title" },
-              { "name":"id", "field": "id" },
-              { "name":"userId", "field": "userId" }
-            ]
-
-        $scope.wordsGridOptions =
-            "enableSorting": true,
-            "multiSelect": false,
-            "enableRowSelection": true,
+            "enableGridMenu": true,
+            onRegisterApi : (gridApi)->
+                $scope.gridApi = gridApi
             "enableSelectAll": true,
+            "exporterCsvFilename": "myFile.csv",
+            "exporterPdfDefaultStyle": {"fontSize": 9},
+            "exporterPdfTableStyle": {"margin": [30, 30, 30, 30]},
+            "exporterPdfTableHeaderStyle": {"fontSize": 10, "bold": true, "italics": true, "color": "red"},
+            "exporterPdfHeader": { "text": "My Header", "style": "headerStyle" },
+            "exporterPdfFooter" : (currentPage, pageCount) ->
+              { text: currentPage.toString() + ' of ' + pageCount.toString(), style: 'footerStyle' }
+            ,
+            "exporterPdfCustomFormatter" : ( docDefinition ) ->
+              docDefinition.styles.headerStyle = { fontSize: 22, bold: true }
+              docDefinition.styles.footerStyle = { fontSize: 10, bold: true }
+              docDefinition
+            ,
+            exporterPdfOrientation: 'portrait',
+            exporterPdfPageSize: 'LETTER',
+            exporterPdfMaxGridWidth: 500,
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location")),
+            "enableSorting": true,
+            "multiSelect": true,
+            "enableRowSelection": true,
             "selectionRowHeaderWidth": 35,
             "rowHeight": 35,
             "showGridFooter":true
             "columnDefs": [
               { "name":"word", "field": "word" },
               { "name":"tag", "field": "tag" },
-              { "name":"freq", "field": "freq" },
+              { "name":"freq", "field": "freq", "type": "number" },
         ]
 
 
@@ -59,6 +59,18 @@ define(['angular'], (angular) ->
     class BookUploadController
           constructor: ($scope, Upload, $timeout, $http) ->
             $scope.file = {} if $scope.file is undefined
+
+            $scope.sendSelected = () ->
+                 $http.post('web/addUserWords', {params: {'words': $scope.gridApi.selection.getSelectedRows()}})
+                    .success (response) ->
+                        if response.status == 'failure'
+                            $scope.errorMsg = response.status
+                        else
+                          angular.forEach($scope.gridApi.selection.getSelectedRows(), (data, index) ->
+                            $scope.gridOptions.data.splice($scope.gridOptions.data.lastIndexOf(data), 1);
+                          );
+                    .error (response) ->
+                        $scope.errorMsg = response.status
 
             $scope.uploadText = (file) ->
                 $http.post('web/contentUpload', {'content': $scope.content})
@@ -84,7 +96,7 @@ define(['angular'], (angular) ->
                     else
                         if response.status == 'done'
                             file.progress = 100
-                            $scope.wordsGridOptions.data = response.data
+                            $scope.gridOptions.data = response.data
                             $scope.f = null
                             return
                         else
