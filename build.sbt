@@ -47,7 +47,8 @@ libraryDependencies in ThisBuild ++= Seq(
   "com.typesafe.play" %% "play-slick" % "0.8.0",
   "org.joda" % "joda-convert" % "1.6",
   "com.jsuereth" %% "scala-arm" % "1.4",
-  "ws.securesocial" %% "securesocial" % "3.0-M1"
+  "ws.securesocial" %% "securesocial" % "3.0-M1",
+  "org.postgresql" % "postgresql" % "9.4.1208.jre7"
 )
 
 // http://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
