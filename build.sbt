@@ -13,8 +13,6 @@ homepage := Some(url("https://blablabla"))
 licenses := Seq("GNU AFFERO GENERAL PUBLIC LICENSE, Version 3" -> url("http://www.gnu.org/licenses/agpl-3.0.txt"))
 
 resolvers in ThisBuild += Resolver.url("Edulify Repository", url("http://edulify.github.io/modules/releases/"))(Resolver.ivyStylePatterns)
-resolvers += Resolver.url("mandubian maven bintray", url("http://dl.bintray.com/mandubian/maven/"))
-//resolvers += "mandubian maven bintray" at "http://dl.bintray.com/mandubian/maven"
 
 lazy val web = (project in file("modules/web"))
   .enablePlugins(PlayScala)
@@ -38,9 +36,6 @@ libraryDependencies ++= Seq(
   "org.webjars" % "angular-file-upload" % "11.0.0"
 )
 
-// http://mvnrepository.com/artifact/org.postgresql/postgresql
-libraryDependencies += "org.postgresql" % "postgresql" % "9.4.1208.jre7"
-
 libraryDependencies in ThisBuild ++= Seq(
   cache,
   jdbc,
@@ -52,7 +47,6 @@ libraryDependencies in ThisBuild ++= Seq(
   "com.typesafe.play" %% "play-slick" % "0.8.0",
   "org.joda" % "joda-convert" % "1.6",
   "com.jsuereth" %% "scala-arm" % "1.4",
-  "com.mandubian" %% "play-json-zipper"    % "1.2",
   "ws.securesocial" %% "securesocial" % "3.0-M1"
 )
 

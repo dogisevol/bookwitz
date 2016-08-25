@@ -24,8 +24,8 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.slick.driver.JdbcDriver.simple._
 import play.api.libs.json._
-//import play.api.libs.json.monad.syntax._
-//import play.api.libs.json.
+
+import scala.collection.mutable.ListBuffer
 
 object BookController {
 }
@@ -111,13 +111,18 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
             logger.debug("Progress response " + text)
             var value = Json.parse(text)
             if ("done".equals(value.\("status").as[String])) {
-              var list = JsArray()
+              var list = ListBuffer[JsValue]()
               value.\("data").as[JsArray].value.map(
                 item =>
-                  //list :+ item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])))
-                  logger.debug(item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String]))).toString())
+                  if (!wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])) {
+                    list += item
+                  }
+                //list :+ item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])))
               )
 
+              value = value.transform((__).json.update(
+                __.read[JsObject].map { o => o ++ Json.obj("data" -> JsArray(list)) }
+              )).asOpt.get
 
               logger.debug(value.toString())
             }
