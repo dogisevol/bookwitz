@@ -52,7 +52,7 @@ libraryDependencies in ThisBuild ++= Seq(
 )
 
 // http://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
-libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.8.11.2"
+//libraryDependencies += "org.xerial" % "sqlite-jdbc" % "3.8.11.2"
 
 
 pipelineStages := Seq(rjs, digest, gzip)
