@@ -4,5 +4,3 @@ GET        /words                @io.bookwitz.users.controllers.UserController.g
 
 GET        /vassets/*file        controllers.Assets.versioned(path="/public/users", file: Asset)
 GET        /assets/*file         controllers.Assets.at(path="/public/users", file)
-
-->         /                 securesocial.Routes

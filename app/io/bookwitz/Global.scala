@@ -2,12 +2,18 @@ package io.bookwitz
 
 import java.lang.reflect.Constructor
 
+import io.bookwitz.users.controllers.{AngularMailTemplates, JsonViewTemplates}
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.users.service.slick.{SlickAuthenticatorStore, SlickUserService}
+import securesocial.controllers.{MailTemplates, ViewTemplates}
 import securesocial.core.RuntimeEnvironment
 import securesocial.core.authenticator.{CookieAuthenticatorBuilder, HttpHeaderAuthenticatorBuilder}
 import securesocial.core.services.{AuthenticatorService, UserService}
 
+/**
+  * @author Joseph Dessens
+  * @since 2014-08-31
+  */
 object Global extends play.api.GlobalSettings {
 
   object MyRuntimeEnvironment extends RuntimeEnvironment.Default[BasicUser] {
@@ -16,6 +22,8 @@ object Global extends play.api.GlobalSettings {
       new CookieAuthenticatorBuilder[BasicUser](new SlickAuthenticatorStore, idGenerator),
       new HttpHeaderAuthenticatorBuilder[BasicUser](new SlickAuthenticatorStore, idGenerator)
     )
+    override lazy val viewTemplates: ViewTemplates = JsonViewTemplates
+    override lazy val mailTemplates: MailTemplates = AngularMailTemplates
   }
 
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
