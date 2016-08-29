@@ -48,7 +48,9 @@ libraryDependencies in ThisBuild ++= Seq(
   "org.joda" % "joda-convert" % "1.6",
   "com.jsuereth" %% "scala-arm" % "1.4",
   "ws.securesocial" %% "securesocial" % "3.0-M1",
-  "org.postgresql" % "postgresql" % "9.4.1208.jre7"
+  "org.postgresql" % "postgresql" % "9.4.1208.jre7",
+  "org.mongodb.scala" % "mongo-scala-driver_2.11" % "1.1.1",
+  "org.mongodb" %% "casbah" % "3.1.1"
 )
 
 // http://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
