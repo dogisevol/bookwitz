@@ -19,7 +19,7 @@ object MongoUserWords extends UserWordsDAO with UserWordsJson {
 }
 
 trait UserWordsDAO extends ModelCompanion[UserWords, String] {
-  def collection = mongoCollection("users")
+  def collection = mongoCollection("user_words")
 
   val dao = new SalatDAO[UserWords, String](collection) {}
 
