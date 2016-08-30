@@ -5,7 +5,7 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import io.bookwitz.service.WordsService
-import io.bookwitz.service.slick.SlickWordsService
+import io.bookwitz.service.mongo.MongoWordsService
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.Book
 import io.bookwitz.web.models.BooksTableQueries.booksList
@@ -36,7 +36,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   val logger = Logger(getClass)
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
-  val wordsService: WordsService = new SlickWordsService
+  val wordsService: WordsService = new MongoWordsService
 
 
   def books = SecuredAction { request => {

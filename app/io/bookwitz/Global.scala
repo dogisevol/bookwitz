@@ -27,12 +27,14 @@ object Global extends play.api.GlobalSettings {
   }
 
   override def getControllerInstance[A](controllerClass: Class[A]): A = {
-    val instance = controllerClass.getConstructors.find { c =>
+    val instance = controllerClass.getConstructors.find { case c =>
       val params = c.getParameterTypes
       params.length == 1 && params(0) == classOf[RuntimeEnvironment[BasicUser]]
     }.map {
       _.asInstanceOf[Constructor[A]].newInstance(MyRuntimeEnvironment)
     }
+
+
     instance.getOrElse(super.getControllerInstance(controllerClass))
   }
 }

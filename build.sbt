@@ -50,7 +50,8 @@ libraryDependencies in ThisBuild ++= Seq(
   "ws.securesocial" %% "securesocial" % "3.0-M1",
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
   "org.mongodb.scala" % "mongo-scala-driver_2.11" % "1.1.1",
-  "org.mongodb" %% "casbah" % "3.1.1"
+  "org.mongodb" %% "casbah" % "3.1.1",
+  "net.cloudinsights" % "play-plugins-salat_2.11" % "1.5.9"
 )
 
 // http://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
