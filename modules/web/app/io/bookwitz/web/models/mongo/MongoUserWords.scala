@@ -6,7 +6,7 @@ import io.bookwitz.web.models.mongo.mongoContext._
 import play.api.Play.current
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
-import se.radley.plugin.salat._
+import plugin.salat._
 
 import scala.collection.mutable.ListBuffer
 
