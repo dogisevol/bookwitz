@@ -147,7 +147,7 @@ class SalatPlugin @Inject() (implicit app: Application) extends Plugin {
           } catch {
             case e: MongoException =>
               Logger("play").error("error: " + e.printStackTrace)
-              Logger("play").debug("_______________: " + e)
+              Logger("play").debug("_______________: ", e)
               throw configuration.reportError("mongodb." + source._1, "couldn't connect to [" + source._2.hosts.mkString(", ") + "]", Some(e))
           } finally {
             Logger("play").info("mongodb [" + source._1 + "] connected at " + source._2)
