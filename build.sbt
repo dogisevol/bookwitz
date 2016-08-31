@@ -51,7 +51,7 @@ libraryDependencies in ThisBuild ++= Seq(
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
   "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.1",
   "org.mongodb" %% "casbah" % "3.1.1",
-  "net.cloudinsights" % "play-plugins-salat_2.11" % "1.5.9"
+  "com.novus" %% "salat" % "1.9.9"
 )
 
 // http://mvnrepository.com/artifact/org.xerial/sqlite-jdbc
