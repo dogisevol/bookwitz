@@ -21,14 +21,13 @@ define(['angular'], (angular) ->
 
   web.factory 'userWords',
     ($resource) ->
-        $resource('/userWords', {}, ->
+        $resource('web/userWords', {}, ->
           query: { method: 'GET' }
         )
-      )
 
   web.controller 'UserWordsController',
     class UserWordsController
-      constructor: ($scope, $http, $location) ->
+      constructor: ($scope, $http, $location, userWords) ->
         $scope.myData = userWords.query();
         $scope.gridOptions =
             "enableGridMenu": true,
