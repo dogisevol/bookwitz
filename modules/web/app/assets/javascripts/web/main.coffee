@@ -9,6 +9,8 @@ define(['angular'], (angular) ->
     ($routeProvider) ->
       $routeProvider.when '/books',
         templateUrl: 'web/vassets/partials/books.tpl.html'
+      $routeProvider.when '/userWords',
+        templateUrl: 'web/vassets/partials/userWords.tpl.html'
       $routeProvider.otherwise
         redirectTo: '/books'
   ]
@@ -16,6 +18,50 @@ define(['angular'], (angular) ->
   web.factory 'navigation',
     ($resource) ->
       $resource('web/navigation')
+
+  web.factory 'userWords',
+    ($resource) ->
+        $resource('/userWords', {}, ->
+          query: { method: 'GET' }
+        )
+      )
+
+  web.controller 'UserWordsController',
+    class UserWordsController
+      constructor: ($scope, $http, $location) ->
+        $scope.myData = userWords.query();
+        $scope.gridOptions =
+            "enableGridMenu": true,
+            onRegisterApi : (gridApi)->
+                $scope.gridApi = gridApi
+            "enableSelectAll": true,
+            "exporterCsvFilename": "myFile.csv",
+            "exporterPdfDefaultStyle": {"fontSize": 9},
+            "exporterPdfTableStyle": {"margin": [30, 30, 30, 30]},
+            "exporterPdfTableHeaderStyle": {"fontSize": 10, "bold": true, "italics": true, "color": "red"},
+            "exporterPdfHeader": { "text": "My Header", "style": "headerStyle" },
+            "exporterPdfFooter" : (currentPage, pageCount) ->
+              { text: currentPage.toString() + ' of ' + pageCount.toString(), style: 'footerStyle' }
+            ,
+            "exporterPdfCustomFormatter" : ( docDefinition ) ->
+              docDefinition.styles.headerStyle = { fontSize: 22, bold: true }
+              docDefinition.styles.footerStyle = { fontSize: 10, bold: true }
+              docDefinition
+            ,
+            exporterPdfOrientation: 'portrait',
+            exporterPdfPageSize: 'LETTER',
+            exporterPdfMaxGridWidth: 500,
+            exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location")),
+            "enableSorting": true,
+            "multiSelect": true,
+            "enableRowSelection": true,
+            "selectionRowHeaderWidth": 35,
+            "rowHeight": 35,
+            "showGridFooter":true
+            "columnDefs": [
+              { "name":"word", "field": "word" }
+        ]
+
 
   web.controller 'BooksController',
     class BooksController

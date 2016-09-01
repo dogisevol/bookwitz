@@ -1,6 +1,5 @@
 GET        /generate-name        @io.bookwitz.users.controllers.UserController.generateName
 GET        /home                 @io.bookwitz.users.controllers.UserController.home
-GET        /words                @io.bookwitz.users.controllers.UserController.getWords
 
 GET        /vassets/*file        controllers.Assets.versioned(path="/public/users", file: Asset)
 GET        /assets/*file         controllers.Assets.at(path="/public/users", file)

@@ -13,6 +13,8 @@ class MainController(override implicit val env: RuntimeEnvironment[BasicUser]) e
 
   def navigation() = SecuredAction { implicit request =>
     Ok(Navigation("default", menus = Seq(
+      NavigationMenu(items = Seq(NavigationItem("Books", "#/books")), position = "left"),
+      NavigationMenu(items = Seq(NavigationItem("UserWords", "#/userWords")), position = "left")
     )).json)
   }
 }
