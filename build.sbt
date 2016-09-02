@@ -49,7 +49,6 @@ libraryDependencies in ThisBuild ++= Seq(
   "com.jsuereth" %% "scala-arm" % "1.4",
   "ws.securesocial" %% "securesocial" % "3.0-M1",
   "org.postgresql" % "postgresql" % "9.4.1208.jre7",
-  "org.mongodb.scala" %% "mongo-scala-driver" % "1.1.1",
   "org.mongodb" %% "casbah" % "2.8.2",
   "com.novus" %% "salat" % "1.9.9"
 )
