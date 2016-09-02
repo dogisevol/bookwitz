@@ -134,7 +134,7 @@ define(['angular'], (angular) ->
                         $timeout (->
                           $scope.progressFile($scope.file, response)
                           return
-                        ), 1000
+                        ), 5000
                 .error (response) ->
                     $scope.errorMsg = response.status
 
@@ -157,7 +157,7 @@ define(['angular'], (angular) ->
                             $timeout (->
                               $scope.progressFile(file, uuid)
                               return
-                            ), 1000
+                            ), 5000
                 .error (response) ->
                     $scope.errorMsg = response.status
             $scope.uploadFiles = (file, errFiles) ->
@@ -170,7 +170,7 @@ define(['angular'], (angular) ->
                 file.upload.then ((response) ->
                     $timeout (->
                     $scope.progressFile(file, response.data)
-                    ), 3000
+                    ), 5000
                 ), ((response) ->
                   if response.status > 0
                     $scope.errorMsg = response.status
