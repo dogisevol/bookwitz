@@ -26,7 +26,7 @@ class MongoWordsService extends WordsService {
   override def getUserWords(user: BasicUser): Future[List[String]] = Future successful {
     MongoUserWords.findOneByUserId(user) match {
       case None =>
-        val userWords = UserWords(user.main.userId, ListBuffer[String]())
+        val userWords = UserWords(user.id, ListBuffer[String]())
         MongoUserWords.save(userWords)
         userWords.words.to[List]
       case Some(userWord) => {

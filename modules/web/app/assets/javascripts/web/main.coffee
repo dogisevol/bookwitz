@@ -19,18 +19,25 @@ define(['angular'], (angular) ->
     ($resource) ->
       $resource('web/navigation')
 
-  web.factory 'userWords',
+  web.factory 'userWordsList',
     ($resource) ->
-        $resource('web/userWords', {}, ->
-          query: { method: 'GET' }
-        )
+        $resource('web/userWords')
 
   web.controller 'UserWordsController',
     class UserWordsController
-      constructor: ($scope, $http, $location, userWords) ->
-        $scope.myData = userWords.query();
+      constructor: ($scope, $http, $location, userWordsList) ->
+        $scope.myData = []
+        userWordsList.query((result)->
+          result.forEach((item)->
+              obj = {}
+              obj['word'] = item;
+              $scope.myData.push(obj)
+            )
+          )
+
         $scope.gridOptions =
             "enableGridMenu": true,
+            "data":  'myData',
             onRegisterApi : (gridApi)->
                 $scope.gridApi = gridApi
             "enableSelectAll": true,

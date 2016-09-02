@@ -17,21 +17,21 @@ class SlickWordsService extends WordsService {
 
   override def addWord(word: String, user: BasicUser) {
     DB withSession { implicit session =>
-      userWordsList+= UserWord(user.main.userId, word)
-  }
+      userWordsList += UserWord(user.id, word)
+    }
   }
 
   override def getUserWords(user: BasicUser): Future[List[String]] = Future successful {
     DB withSession { implicit session =>
       userWordsList
-        .filter(sp => sp.userId === user.main.userId).list.map(p => p.word)
+        .filter(sp => sp.userId === user.id).list.map(p => p.word)
     }
   }
 
   override def containsWord(user: BasicUser, word: String): Boolean = {
     DB withSession { implicit session =>
       userWordsList
-        .filter(sp => sp.word === word).list.length == 1
+        .filter(sp => sp.word === word && sp.userId === user.id).list.length == 1
     }
   }
 }

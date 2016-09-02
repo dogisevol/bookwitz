@@ -11,7 +11,7 @@ import plugin.salat._
 import scala.collection.mutable.ListBuffer
 
 case class UserWords(
-                      userId: String,
+                      userId: Long,
                       words: ListBuffer[String]
                     )
 
@@ -27,10 +27,10 @@ trait UserWordsDAO extends ModelCompanion[UserWords, String] {
   //TODO
 
   // Queries
-  def findOneByUserId(userId: String): Option[UserWords] = dao.findOneById(userId)
+  def findOneByUserId(userId: Long): Option[UserWords] = dao.findOneById(String.valueOf(userId))
 
   def findOneByUserId(user: BasicUser): Option[UserWords] = {
-    findOneByUserId(user.main.userId)
+    findOneByUserId(user.id)
   }
 
 }
@@ -43,13 +43,13 @@ trait UserWordsJson {
   implicit val userJsonWrite = new Writes[UserWords] {
     def writes(u: UserWords): JsValue = {
       Json.obj(
-        "userId" -> JsString(u.userId),
+        "userId" -> JsNumber(u.userId),
         "words" -> Json.toJson(u.words)
       )
     }
   }
   implicit val userJsonRead = (
-    (__ \ 'userId).read[String] ~
+    (__ \ 'userId).read[Long] ~
       (__ \ 'words).read[ListBuffer[String]]
     ) (UserWords.apply _)
 }

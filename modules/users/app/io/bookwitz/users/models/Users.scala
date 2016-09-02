@@ -13,7 +13,7 @@ case class User(id: String, mainId: Long) {
     val main = profiles.filter(_.id === mainId).first
     val identities = profiles.filter(p => p.userId === id && p.id =!= mainId).list
 
-    BasicUser(main.basicProfile, identities.map(i => i.basicProfile))
+    BasicUser(main.basicProfile, identities.map(i => i.basicProfile), mainId)
   }
 }
 
