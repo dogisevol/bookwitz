@@ -1,5 +1,6 @@
 package io.bookwitz.web.models.mongo
 
+import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat.dao._
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.mongo.mongoContext._
@@ -27,7 +28,7 @@ trait UserWordsDAO extends ModelCompanion[UserWords, String] {
   //TODO
 
   // Queries
-  def findOneByUserId(userId: Long): Option[UserWords] = dao.findOneById(String.valueOf(userId))
+  def findOneByUserId(userId: Long): Option[UserWords] = dao.findOne(MongoDBObject("userId" -> userId))
 
   def findOneByUserId(user: BasicUser): Option[UserWords] = {
     findOneByUserId(user.id)
