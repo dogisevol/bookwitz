@@ -17,9 +17,13 @@ class MongoWordsService extends WordsService {
   override def addWord(word: String, user: BasicUser): Unit = {
     MongoUserWords.findOneByUserId(user) match {
       case None =>
+        logger.debug("User words: found nothing")
       //TODO exception handling
       case Some(userWord) => {
+        logger.debug("found userWord: " + userWord._id)
+        logger.debug("userWordList: " + userWord.words)
         userWord.words.toBuffer += word
+        logger.debug("userWordList after word adding: " + userWord.words)
         MongoUserWords.save(userWord)
       }
     }
