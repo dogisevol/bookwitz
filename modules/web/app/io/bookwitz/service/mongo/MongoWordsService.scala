@@ -1,5 +1,6 @@
 package io.bookwitz.service.mongo
 
+import com.mongodb.BasicDBList
 import io.bookwitz.service.WordsService
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.mongo.{MongoUserWords, UserWords}
@@ -8,6 +9,7 @@ import securesocial.core.providers.{UsernamePasswordProvider => UserPass}
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
+import io.bookwitz.web.models.mongo.mongoContext._
 
 class MongoWordsService extends WordsService {
   val logger: Logger = Logger(this.getClass)
@@ -26,7 +28,7 @@ class MongoWordsService extends WordsService {
   override def getUserWords(user: BasicUser): Future[List[String]] = Future successful {
     MongoUserWords.findOneByUserId(user) match {
       case None =>
-        val userWords = UserWords(None, String.valueOf(user.id), ListBuffer[String]())
+        val userWords = UserWords(None, String.valueOf(user.id), Seq[String]())
         MongoUserWords.save(userWords)
         userWords.words.to[List]
       case Some(userWord) => {

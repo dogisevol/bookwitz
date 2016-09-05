@@ -1,5 +1,6 @@
 package io.bookwitz.web.models.mongo
 
+import com.mongodb.BasicDBList
 import com.mongodb.casbah.commons.MongoDBObject
 import com.novus.salat.dao._
 import io.bookwitz.users.models.BasicUser
@@ -9,12 +10,10 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json._
 import plugin.salat._
 
-import scala.collection.mutable.ListBuffer
-
 case class UserWords(
                       _id: Option[String],
                       userId: String,
-                      words: ListBuffer[String]
+                      words: Seq[String]
                     )
 
 object MongoUserWords extends UserWordsDAO with UserWordsJson {
@@ -54,6 +53,6 @@ trait UserWordsJson {
   implicit val userJsonRead = (
     (__ \ '_id).read[Option[String]] ~
       (__ \ 'userId).read[String] ~
-      (__ \ 'words).read[ListBuffer[String]]
+      (__ \ 'words).read[Seq[String]]
     ) (UserWords.apply _)
 }
