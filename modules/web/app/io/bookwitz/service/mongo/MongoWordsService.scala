@@ -19,7 +19,7 @@ class MongoWordsService extends WordsService {
       case None =>
       //TODO exception handling
       case Some(userWord) => {
-        userWord.words += word
+        userWord.words.toList += word
         MongoUserWords.save(userWord)
       }
     }
