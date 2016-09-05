@@ -12,6 +12,7 @@ import plugin.salat._
 import scala.collection.mutable.ListBuffer
 
 case class UserWords(
+                      _id: Option[String],
                       userId: String,
                       words: ListBuffer[String]
                     )
@@ -44,13 +45,15 @@ trait UserWordsJson {
   implicit val userJsonWrite = new Writes[UserWords] {
     def writes(u: UserWords): JsValue = {
       Json.obj(
+        "_id" -> JsString(u._id.get),
         "userId" -> JsString(u.userId),
         "words" -> Json.toJson(u.words)
       )
     }
   }
   implicit val userJsonRead = (
-    (__ \ 'userId).read[String] ~
+    (__ \ '_id).read[Option[String]] ~
+      (__ \ 'userId).read[String] ~
       (__ \ 'words).read[ListBuffer[String]]
     ) (UserWords.apply _)
 }
