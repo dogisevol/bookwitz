@@ -28,7 +28,7 @@ trait UserWordsDAO extends ModelCompanion[UserWords, String] {
   //TODO
 
   // Queries
-  def findOneByUserId(userId: Long): Option[UserWords] = dao.findOne(MongoDBObject("userId" -> userId))
+  def findOneByUserId(userId: Long): Option[UserWords] = dao.findOne(MongoDBObject("userId" -> String.valueOf(userId)))
 
   def findOneByUserId(user: BasicUser): Option[UserWords] = {
     findOneByUserId(user.id)
