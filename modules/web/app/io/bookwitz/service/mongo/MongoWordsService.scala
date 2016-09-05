@@ -1,15 +1,12 @@
 package io.bookwitz.service.mongo
 
-import com.mongodb.BasicDBList
 import io.bookwitz.service.WordsService
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.mongo.{MongoUserWords, UserWords}
 import play.api.Logger
 import securesocial.core.providers.{UsernamePasswordProvider => UserPass}
 
-import scala.collection.mutable.ListBuffer
 import scala.concurrent.Future
-import io.bookwitz.web.models.mongo.mongoContext._
 
 class MongoWordsService extends WordsService {
   val logger: Logger = Logger(this.getClass)
@@ -20,11 +17,13 @@ class MongoWordsService extends WordsService {
         logger.error("User words: found nothing")
       //TODO exception handling
       case Some(userWord) => {
+        //TODO 
         logger.error("found userWord: " + userWord._id)
         logger.error("userWordList: " + userWord.words)
-        userWord.words.toBuffer += word
-        logger.error("userWordList after word adding: " + userWord.words)
-        MongoUserWords.save(userWord)
+        val buffer = userWord.words.toBuffer
+        buffer += word
+        logger.error("buffer after word adding: " + buffer)
+        MongoUserWords.save(UserWords(userWord._id, userWord.userId, buffer.toList))
       }
     }
   }
