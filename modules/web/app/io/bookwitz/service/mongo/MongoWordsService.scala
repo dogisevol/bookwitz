@@ -59,9 +59,13 @@ class MongoWordsService extends WordsService {
         logger.error("User words: found nothing")
       //TODO exception handling
       case Some(userWords) => {
-        userWords.words.find(_.word == word).map(u =>
+        userWords.words.find(_.word == word).map(u => {
+          logger.error("before: " + u.toString)
           u.copy(u.userId, u.word, Option.apply(note))
+          logger.error("after" + u.toString)
+        }
         )
+        logger.error(userWords.words.toString())
         MongoUserWords.save(userWords)
       }
     }
