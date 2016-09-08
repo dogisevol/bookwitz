@@ -15,16 +15,24 @@ import scala.slick.driver.JdbcDriver.simple._
 class SlickWordsService extends WordsService {
   val logger: Logger = Logger(this.getClass)
 
-  override def addWord(word: String, user: BasicUser) {
+  override def addWord(word: String, note: String, user: BasicUser) {
     DB withSession { implicit session =>
-      userWordsList += UserWord(user.id, word)
+      userWordsList += UserWord(Option.apply(user.id), word, Option.apply(note))
     }
   }
 
-  override def getUserWords(user: BasicUser): Future[List[String]] = Future successful {
+  override def updateWord(word: String, note: String, user: BasicUser) {
     DB withSession { implicit session =>
       userWordsList
-        .filter(sp => sp.userId === user.id).list.map(p => p.word)
+        .filter(sp => sp.word === word && sp.userId === user.id).update(UserWord(Option.apply(user.id), word, Option.apply(note)))
+    }
+  }
+
+
+  override def getUserWords(user: BasicUser): Future[List[UserWord]] = Future successful {
+    DB withSession { implicit session =>
+      userWordsList
+        .filter(sp => sp.userId === user.id).list
     }
   }
 
@@ -33,5 +41,9 @@ class SlickWordsService extends WordsService {
       userWordsList
         .filter(sp => sp.word === word && sp.userId === user.id).list.length == 1
     }
+  }
+
+  override def containsWord(user: BasicUser, word: UserWord): Boolean = {
+    containsWord(user, word.word)
   }
 }

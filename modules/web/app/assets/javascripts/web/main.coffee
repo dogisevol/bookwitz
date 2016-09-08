@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection', 'ui.grid.exporter'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
 
   web.config [
     '$routeProvider',
@@ -29,9 +29,7 @@ define(['angular'], (angular) ->
         $scope.myData = []
         userWordsList.query((result)->
           result.forEach((item)->
-              obj = {}
-              obj['word'] = item;
-              $scope.myData.push(obj)
+              $scope.myData.push(item)
             )
           )
 
@@ -40,6 +38,14 @@ define(['angular'], (angular) ->
             "data":  'myData',
             onRegisterApi : (gridApi)->
                 $scope.gridApi = gridApi
+                gridApi.edit.on.afterCellEdit($scope,(rowEntity, colDef, newValue, oldValue)->
+                    $http.post('web/updateUserWord', {'word': rowEntity.word, 'note': newValue})
+                    .success (response) ->
+                        if response.status == 'failure'
+                            $scope.errorMsg = response.status
+                    .error (response) ->
+                        $scope.errorMsg = response.status
+              )
             "enableSelectAll": true,
             "exporterCsvFilename": "myFile.csv",
             "exporterPdfDefaultStyle": {"fontSize": 9},
@@ -65,9 +71,9 @@ define(['angular'], (angular) ->
             "rowHeight": 35,
             "showGridFooter":true
             "columnDefs": [
-              { "name":"word", "field": "word" }
-        ]
-
+              { "name":"word", "field": "word", enableCellEdit: false },
+              { "name":"note", "field": "note" }
+            ]
 
   web.controller 'BooksController',
     class BooksController

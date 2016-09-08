@@ -8,8 +8,8 @@ import io.bookwitz.service.WordsService
 import io.bookwitz.service.mongo.MongoWordsService
 import io.bookwitz.service.slick.SlickWordsService
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.Book
 import io.bookwitz.web.models.BooksTableQueries.booksList
+import io.bookwitz.web.models.{Book, UserWord}
 import play.api.Logger
 import play.api.Play.current
 import play.api.db.DB
@@ -38,7 +38,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
   val wordsService: WordsService = new MongoWordsService
-//    val wordsService: WordsService = new SlickWordsService
+  //val wordsService: WordsService = new SlickWordsService
 
 
   def books = SecuredAction { request => {
@@ -49,6 +49,14 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
+  implicit val userWordJsonWrite = new Writes[UserWord] {
+    def writes(u: UserWord): JsValue = {
+      Json.obj(
+        "word" -> JsString(u.word),
+        "note" -> JsString(u.note.getOrElse(""))
+      )
+    }
+  }
 
   def userWords() = SecuredAction.async { request => {
     val words = wordsService.getUserWords(request.user)
@@ -73,7 +81,8 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     request.body.\\("word").foreach(
       word =>
         try {
-          wordsService.addWord(word.as[String], request.user)
+          //TODO note
+          wordsService.addWord(word.as[String], "", request.user)
         } catch {
           case e: Exception => {
             logger.error("Cannot add user word", e)
@@ -81,6 +90,20 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
           }
         }
     )
+    Ok
+  }
+  }
+
+  def updateUserWord = SecuredAction(parse.json(maxLength = 1024 * 1024)) { request => {
+    try {
+      //TODO note
+      wordsService.updateWord(request.body.\("word").as[String], request.body.\("note").as[String], request.user)
+    } catch {
+      case e: Exception => {
+        logger.error("Cannot add user word", e)
+        InternalServerError
+      }
+    }
     Ok
   }
   }
