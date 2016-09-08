@@ -20,9 +20,7 @@ class MongoWordsService extends WordsService {
       case Some(userWords) => {
         //TODO
         val buffer = userWords.words.toBuffer
-        logger.error("new note: " + UserWord(Option.apply(user.id), word, Option.apply(note)))
         buffer += UserWord(Option.apply(user.id), word, Option.apply(note))
-        logger.error(buffer.toString())
         MongoUserWords.save(UserWords(userWords._id, userWords.userId, buffer.toList))
       }
     }
@@ -56,6 +54,16 @@ class MongoWordsService extends WordsService {
   }
 
   override def updateWord(word: String, note: String, user: BasicUser): Unit = {
-    addWord(word, note, user)
+    MongoUserWords.findOneByUserId(user) match {
+      case None =>
+        logger.error("User words: found nothing")
+      //TODO exception handling
+      case Some(userWords) => {
+        userWords.words.find(_.word == word).map(u =>
+          u.copy(u.userId, u.word, Option.apply(note))
+        )
+        MongoUserWords.save(userWords)
+      }
+    }
   }
 }
