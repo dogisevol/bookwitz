@@ -20,7 +20,9 @@ class MongoWordsService extends WordsService {
       case Some(userWords) => {
         //TODO
         val buffer = userWords.words.toBuffer
+        logger.error("new note: " + UserWord(Option.apply(user.id), word, Option.apply(note)))
         buffer += UserWord(Option.apply(user.id), word, Option.apply(note))
+        logger.error(buffer.toString())
         MongoUserWords.save(UserWords(userWords._id, userWords.userId, buffer.toList))
       }
     }
