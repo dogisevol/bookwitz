@@ -61,7 +61,7 @@ trait UserWordsJson {
   }
 
   implicit val userWordJsonRead = (
-    (__ \ 'userId).read[Option[Long]] ~
+    Reads.pure(None) ~
       (__ \ 'word).read[String] ~
       (__ \ 'note).read[Option[String]]
     ) (UserWord.apply _)
