@@ -59,14 +59,11 @@ class MongoWordsService extends WordsService {
         logger.error("User words: found nothing")
       //TODO exception handling
       case Some(userWords) => {
-        userWords.words.find(_.word == word).map(u => {
-          logger.error("before: " + u.toString)
-          u.copy(u.userId, u.word, Option.apply(note))
-          logger.error("after" + u.toString)
-        }
+        //TODO find a right way to do it
+        val userWord = userWords.words.find(_.word == word).getOrElse(
+          throw new Exception("Couldn't find userWord for update")
         )
-        logger.error(userWords.words.toString())
-        MongoUserWords.save(userWords)
+        MongoUserWords.save(UserWords(userWords._id, userWords.userId, userWords.words.updated(userWords.words.indexOf(userWord), userWord)))
       }
     }
   }
