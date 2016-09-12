@@ -8,5 +8,6 @@ GET       /bookUpload            @io.bookwitz.controllers.BookController.bookPro
 GET       /userWords             @io.bookwitz.controllers.BookController.userWords
 POST      /contentUpload         @io.bookwitz.controllers.BookController.contentUpload
 POST      /addUserWords          @io.bookwitz.controllers.BookController.addUserWords
-POST      /updateUserWord          @io.bookwitz.controllers.BookController.updateUserWord
+POST      /updateUserWord        @io.bookwitz.controllers.BookController.updateUserWord
+GET      /book                   @io.bookwitz.controllers.BookController.book
 

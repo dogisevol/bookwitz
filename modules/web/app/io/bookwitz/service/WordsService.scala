@@ -1,7 +1,7 @@
 package io.bookwitz.service
 
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.UserWord
+import io.bookwitz.web.models.{UserBook, UserWord}
 
 import scala.concurrent.Future
 
@@ -16,5 +16,9 @@ trait WordsService {
   def containsWord(user: BasicUser, word: UserWord): Boolean
 
   def containsWord(user: BasicUser, word: String): Boolean
+
+  def getBook(user: BasicUser): String
+
+  def addOrUpdateBook(book: String, user: BasicUser): UserBook
 
 }

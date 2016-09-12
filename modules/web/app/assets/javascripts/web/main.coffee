@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
 
   web.config [
     '$routeProvider',
@@ -22,6 +22,10 @@ define(['angular'], (angular) ->
   web.factory 'userWordsList',
     ($resource) ->
         $resource('web/userWords')
+
+  web.factory 'userBook',
+    ($resource) ->
+      $resource('web/book')
 
   web.controller 'UserWordsController',
     class UserWordsController
@@ -78,7 +82,13 @@ define(['angular'], (angular) ->
 
   web.controller 'BooksController',
     class BooksController
-      constructor: ($scope, $http, $location) ->
+      constructor: ($scope, $http, $location, userBook) ->
+        userBook.get((result)->
+          $scope.gridOptions.data = []
+          result.data.forEach((item)->
+              $scope.gridOptions.data.push(item)
+            )
+          )
         $scope.gridOptions =
             "enableGridMenu": true,
             onRegisterApi : (gridApi)->

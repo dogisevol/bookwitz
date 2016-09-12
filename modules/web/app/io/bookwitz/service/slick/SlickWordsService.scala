@@ -2,8 +2,8 @@ package io.bookwitz.service.slick
 
 import io.bookwitz.service.WordsService
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.BooksTableQueries.userWordsList
-import io.bookwitz.web.models.UserWord
+import io.bookwitz.web.models.BooksTableQueries.{userBooksList, userWordsList}
+import io.bookwitz.web.models.{UserBook, UserWord}
 import play.api.Logger
 import play.api.Play.current
 import play.api.db.slick.DB
@@ -46,4 +46,28 @@ class SlickWordsService extends WordsService {
   override def containsWord(user: BasicUser, word: UserWord): Boolean = {
     containsWord(user, word.word)
   }
+
+  override def getBook(user: BasicUser): String = {
+    DB withSession { implicit session =>
+      if (userBooksList.length.run > 0) {
+        userBooksList.first.book
+      } else {
+        ""
+      }
+    }
+  }
+
+  override def addOrUpdateBook(book: String, user: BasicUser) {
+    DB withSession { implicit session =>
+      userBooksList
+        .filter(p => p.userId === user.id)
+        .firstOption match {
+        case Some(p) =>
+          userBooksList.update(UserBook(Option.apply(user.id), book, None))
+        case None =>
+          userBooksList += UserBook(Option.apply(user.id), book, None)
+      }
+    }
+  }
+
 }

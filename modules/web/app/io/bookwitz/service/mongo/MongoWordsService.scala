@@ -2,7 +2,7 @@ package io.bookwitz.service.mongo
 
 import io.bookwitz.service.WordsService
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.UserWord
+import io.bookwitz.web.models.{UserBook, UserWord}
 import io.bookwitz.web.models.mongo.{MongoUserWords, UserWords}
 import play.api.Logger
 import securesocial.core.providers.{UsernamePasswordProvider => UserPass}
@@ -67,4 +67,8 @@ class MongoWordsService extends WordsService {
       }
     }
   }
+
+  override def getBook(user: BasicUser): String = ???
+
+  override def addOrUpdateBook(book: String, user: BasicUser): UserBook = ???
 }

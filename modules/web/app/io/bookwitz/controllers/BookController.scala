@@ -5,7 +5,6 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.model._
 import akka.stream.ActorMaterializer
 import io.bookwitz.service.WordsService
-import io.bookwitz.service.mongo.MongoWordsService
 import io.bookwitz.service.slick.SlickWordsService
 import io.bookwitz.users.models.BasicUser
 import io.bookwitz.web.models.BooksTableQueries.booksList
@@ -33,7 +32,7 @@ object BookController {
 class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) extends SecureSocial[BasicUser] {
 
   //val PARSER_URI: String = "https://dictwitz.herokuapp.com/bookUpload"
-  val PARSER_URI: String = "https://localhost:8080/bookUpload"
+  val PARSER_URI: String = "http://localhost:8080/bookUpload"
 
   val logger = Logger(getClass)
   implicit val system = ActorSystem()
@@ -69,6 +68,12 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
       message =>
         Ok(Json.toJson(message))
     )
+  }
+  }
+
+  def book() = SecuredAction.async { request => {
+    Future(Ok(wordsService.getBook(request.user)))
+    Future(Ok(wordsService.addOrUpdateBook(removeKnownWords(wordsService.getBook(request.user), request.user), request.user).book))
   }
   }
 
@@ -149,24 +154,13 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
             val text = entity.data.decodeString("UTF-8")
             logger.debug("Progress response " + text)
             try {
-              var value = Json.parse(text)
+              val value = Json.parse(text)
               if ("done".equals(value.\("status").as[String])) {
-                var list = ListBuffer[JsValue]()
-                value.\("data").as[JsArray].value.map(
-                  item =>
-                    if (!wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])) {
-                      list += item
-                    }
-                  //list :+ item.as[JsObject].+("userWord" -> Json.toJson(wordsService.containsWord(request.user, item.as[JsObject].\("word").as[String])))
-                )
-
-                value = value.transform((__).json.update(
-                  __.read[JsObject].map { o => o ++ Json.obj("data" -> JsArray(list)) }
-                )).asOpt.get
-
-                logger.debug(value.toString())
+                val result: String = removeKnownWords(value, request.user)
+                Future(Ok(wordsService.addOrUpdateBook(removeKnownWords(value, request.user), request.user).book))
+              } else {
+                Future(Ok(text))
               }
-              Future(Ok(value))
             } catch {
               case e: Exception =>
                 logger.error("cannot parse the response", e)
@@ -177,6 +171,27 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
       }
     )
   }
+  }
+
+  def removeKnownWords(json: String, user: BasicUser): String = {
+    removeKnownWords(Json.parse(json), user)
+  }
+
+  def removeKnownWords(json: JsValue, user: BasicUser): String = {
+    var value = json
+    var list = ListBuffer[JsValue]()
+    value.\("data").as[JsArray].value.map(
+      item =>
+        if (!wordsService.containsWord(user, item.as[JsObject].\("word").as[String])) {
+          list += item
+        }
+    )
+
+    value = value.transform((__).json.update(
+      __.read[JsObject].map { o => o ++ Json.obj("data" -> JsArray(list)) }
+    )).asOpt.get
+    val result = Json.stringify(value)
+    result
   }
 
   def forwardUpload(content: String): Future[Result] = {

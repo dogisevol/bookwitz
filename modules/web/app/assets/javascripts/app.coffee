@@ -17,6 +17,7 @@ require([
     '/vassets/javascripts/users/main.js',
     'angular-ui',
     'ui-grid',
+    'ui-bootstrap',
     'ng-file-upload'
   ], (angular) ->
 
