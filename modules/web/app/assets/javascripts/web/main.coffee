@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
 
   web.config [
     '$routeProvider',
@@ -46,6 +46,7 @@ define(['angular'], (angular) ->
                     .error (response) ->
                         $scope.errorMsg = response.status
               )
+            "enableFiltering": true,
             "enableSelectAll": true,
             "exporterCsvFilename": "myFile.csv",
             "exporterPdfDefaultStyle": {"fontSize": 9},
@@ -82,6 +83,7 @@ define(['angular'], (angular) ->
             "enableGridMenu": true,
             onRegisterApi : (gridApi)->
                 $scope.gridApi = gridApi
+            "enableFiltering": true,
             "enableSelectAll": true,
             "exporterCsvFilename": "myFile.csv",
             "exporterPdfDefaultStyle": {"fontSize": 9},
@@ -184,6 +186,23 @@ define(['angular'], (angular) ->
                 ), (evt) ->
                   file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
                   return
+
+  web.controller 'ModalDefinitionController',
+    class ModalDefinitionController
+          constructor: ($scope, $modal, $timeout, $http) ->
+            $scope.items = ['item1', 'item2', 'item3']
+
+            $scope.open = () ->
+                alert(1)
+
+  web.controller 'ModalDefinitionInstanceController',
+    class ModalDefinitionInstanceController
+        constructor: ($scope, $modal, $timeout, $http) ->
+            $scope.items = ['item1', 'item2', 'item3']
+
+            $scope.close = () ->
+                $modalInstance.close($scope.selected.item);
+
 
   web.directive 'bookwitzInput', ->
     restrict: 'E'

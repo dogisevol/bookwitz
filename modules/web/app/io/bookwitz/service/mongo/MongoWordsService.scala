@@ -44,7 +44,7 @@ class MongoWordsService extends WordsService {
         //TODO exception handling
         false
       case Some(userWords) => {
-        userWords.words.contains(word)
+        userWords.words.contains(UserWord(Option.apply(user.id), word, None))
       }
     }
   }
