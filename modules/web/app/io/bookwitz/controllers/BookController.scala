@@ -32,13 +32,14 @@ object BookController {
 
 class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) extends SecureSocial[BasicUser] {
 
-  val PARSER_URI: String = "https://dictwitz.herokuapp.com/bookUpload"
+  //val PARSER_URI: String = "https://dictwitz.herokuapp.com/bookUpload"
+  val PARSER_URI: String = "https://localhost:8080/bookUpload"
 
   val logger = Logger(getClass)
   implicit val system = ActorSystem()
   implicit val materializer = ActorMaterializer()
-  val wordsService: WordsService = new MongoWordsService
-  //val wordsService: WordsService = new SlickWordsService
+  //val wordsService: WordsService = new MongoWordsService
+  val wordsService: WordsService = new SlickWordsService
 
 
   def books = SecuredAction { request => {
