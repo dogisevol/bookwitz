@@ -57,16 +57,18 @@ class SlickWordsService extends WordsService {
     }
   }
 
-  override def addOrUpdateBook(book: String, user: BasicUser) {
+  override def addOrUpdateBook(book: String, user: BasicUser): UserBook = {
     DB withSession { implicit session =>
+      val result = UserBook(Option.apply(user.id), book, None)
       userBooksList
         .filter(p => p.userId === user.id)
         .firstOption match {
         case Some(p) =>
-          userBooksList.update(UserBook(Option.apply(user.id), book, None))
+          userBooksList.update(result)
         case None =>
-          userBooksList += UserBook(Option.apply(user.id), book, None)
+          userBooksList += result
       }
+      result
     }
   }
 
