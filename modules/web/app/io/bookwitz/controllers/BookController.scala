@@ -77,6 +77,11 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
+  def wordDefinitions() = SecuredAction.async { request => {
+    Future(Ok("[\"test\", \"test1\"]"))
+  }
+  }
+
 
   def contentUpload = SecuredAction.async(parse.json(maxLength = 1024 * 1024)) { request => {
     forwardUpload(request.body.\("content").as[String])

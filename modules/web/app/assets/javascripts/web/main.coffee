@@ -27,6 +27,10 @@ define(['angular'], (angular) ->
     ($resource) ->
       $resource('web/book')
 
+  web.factory 'wordDefinitions',
+    ($resource) ->
+      $resource('web/wordDefinitions')
+
   web.controller 'UserWordsController',
     class UserWordsController
       constructor: ($scope, $http, $location, userWordsList) ->
@@ -196,7 +200,10 @@ define(['angular'], (angular) ->
                 ), (evt) ->
                   file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
                   return
-            $scope.open = () ->
+
+            $scope.items = ['item1', 'item2', 'item3']
+
+            $scope.openModal = () ->
                    modalInstance = $uibModal.open({
                       templateUrl: '/web/vassets/partials/modal.tpl.html',
                       controller: BookUploadController,
@@ -204,15 +211,9 @@ define(['angular'], (angular) ->
                         items: ->
                           return $scope.items
                       }
-                    })
-
-  web.controller 'ModalDefinitionInstanceController',
-    class ModalDefinitionInstanceController
-        constructor: ($scope, $modal, $timeout, $http) ->
-            $scope.items = ['item1', 'item2', 'item3']
-
-            $scope.close = () ->
-                $modalInstance.close($scope.selected.item);
+                    }).result
+            $scope.closeModal = ->
+                $modalInstance.close();
 
 
   web.directive 'bookwitzInput', ->

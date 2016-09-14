@@ -10,4 +10,5 @@ POST      /contentUpload         @io.bookwitz.controllers.BookController.content
 POST      /addUserWords          @io.bookwitz.controllers.BookController.addUserWords
 POST      /updateUserWord        @io.bookwitz.controllers.BookController.updateUserWord
 GET      /book                   @io.bookwitz.controllers.BookController.book
+GET      /wordDefinitions        @io.bookwitz.controllers.BookController.wordDefinitions(word: String)
 
