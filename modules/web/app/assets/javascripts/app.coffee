@@ -18,6 +18,7 @@ require([
     'angular-ui',
     'ui-grid',
     'ui-bootstrap',
+    'ui-bootstrap-tpls',
     'ng-file-upload'
   ], (angular) ->
 

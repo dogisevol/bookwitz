@@ -88,7 +88,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
       word =>
         try {
           //TODO note
-          wordsService.addWord(word.as[String], "", request.user)
+          wordsService.addOrUpdateWord(word.as[String], "", request.user)
         } catch {
           case e: Exception => {
             logger.error("Cannot add user word", e)
@@ -103,7 +103,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   def updateUserWord = SecuredAction(parse.json(maxLength = 1024 * 1024)) { request => {
     try {
       //TODO note
-      wordsService.updateWord(request.body.\("word").as[String], request.body.\("note").as[String], request.user)
+      wordsService.addOrUpdateWord(request.body.\("word").as[String], request.body.\("note").as[String], request.user)
     } catch {
       case e: Exception => {
         logger.error("Cannot add user word", e)

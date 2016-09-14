@@ -7,9 +7,7 @@ import scala.concurrent.Future
 
 trait WordsService {
 
-  def addWord(word: String, note: String, user: BasicUser)
-
-  def updateWord(word: String, note: String, user: BasicUser)
+  def addOrUpdateWord(word: String, note: String, user: BasicUser)
 
   def getUserWords(user: BasicUser): Future[List[UserWord]]
 

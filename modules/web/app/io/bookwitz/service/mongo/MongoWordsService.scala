@@ -2,8 +2,8 @@ package io.bookwitz.service.mongo
 
 import io.bookwitz.service.WordsService
 import io.bookwitz.users.models.BasicUser
-import io.bookwitz.web.models.{UserBook, UserWord}
 import io.bookwitz.web.models.mongo.{MongoUserWords, UserWords}
+import io.bookwitz.web.models.{UserBook, UserWord}
 import play.api.Logger
 import securesocial.core.providers.{UsernamePasswordProvider => UserPass}
 
@@ -11,20 +11,6 @@ import scala.concurrent.Future
 
 class MongoWordsService extends WordsService {
   val logger: Logger = Logger(this.getClass)
-
-  override def addWord(word: String, note: String, user: BasicUser): Unit = {
-    MongoUserWords.findOneByUserId(user) match {
-      case None =>
-        logger.error("User words: found nothing")
-      //TODO exception handling
-      case Some(userWords) => {
-        //TODO
-        val buffer = userWords.words.toBuffer
-        buffer += UserWord(Option.apply(user.id), word, Option.apply(note))
-        MongoUserWords.save(UserWords(userWords._id, userWords.userId, buffer.toList))
-      }
-    }
-  }
 
   override def getUserWords(user: BasicUser): Future[List[UserWord]] = Future successful {
     MongoUserWords.findOneByUserId(user) match {
@@ -53,17 +39,21 @@ class MongoWordsService extends WordsService {
     containsWord(user, word.word)
   }
 
-  override def updateWord(word: String, note: String, user: BasicUser): Unit = {
+  override def addOrUpdateWord(word: String, note: String, user: BasicUser): Unit = {
     MongoUserWords.findOneByUserId(user) match {
       case None =>
         logger.error("User words: found nothing")
       //TODO exception handling
       case Some(userWords) => {
         //TODO find a right way to do it
-        val userWord = userWords.words.find(_.word == word).getOrElse(
-          throw new Exception("Couldn't find userWord for update")
-        )
-        MongoUserWords.save(UserWords(userWords._id, userWords.userId, userWords.words.updated(userWords.words.indexOf(userWord), userWord)))
+        val userWord = userWords.words.find(_.word == word)
+        if (userWord.isEmpty) {
+          val buffer = userWords.words.toBuffer
+          buffer += UserWord(Option.apply(user.id), word, Option.apply(note))
+          MongoUserWords.save(UserWords(userWords._id, userWords.userId, buffer.toList))
+        } else {
+          MongoUserWords.save(UserWords(userWords._id, userWords.userId, userWords.words.updated(userWords.words.indexOf(userWord.get), userWord.get)))
+        }
       }
     }
   }

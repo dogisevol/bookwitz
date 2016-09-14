@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
 
   web.config [
     '$routeProvider',
@@ -127,7 +127,7 @@ define(['angular'], (angular) ->
 
   web.controller 'BookUploadController',
     class BookUploadController
-          constructor: ($scope, Upload, $timeout, $http) ->
+          constructor: ($scope, Upload, $timeout, $http, $uibModal) ->
             $scope.file = {} if $scope.file is undefined
 
             $scope.sendSelected = () ->
@@ -196,14 +196,15 @@ define(['angular'], (angular) ->
                 ), (evt) ->
                   file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
                   return
-
-  web.controller 'ModalDefinitionController',
-    class ModalDefinitionController
-          constructor: ($scope, $modal, $timeout, $http) ->
-            $scope.items = ['item1', 'item2', 'item3']
-
             $scope.open = () ->
-                alert(1)
+                   modalInstance = $uibModal.open({
+                      templateUrl: '/web/vassets/partials/modal.tpl.html',
+                      controller: BookUploadController,
+                      resolve: {
+                        items: ->
+                          return $scope.items
+                      }
+                    })
 
   web.controller 'ModalDefinitionInstanceController',
     class ModalDefinitionInstanceController
