@@ -77,12 +77,6 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   }
   }
 
-  def wordDefinitions() = SecuredAction.async { request => {
-    Future(Ok("[\"test\", \"test1\"]"))
-  }
-  }
-
-
   def contentUpload = SecuredAction.async(parse.json(maxLength = 1024 * 1024)) { request => {
     forwardUpload(request.body.\("content").as[String])
   }
@@ -202,6 +196,39 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
   def forwardUpload(content: String): Future[Result] = {
     val httpRequest = HttpRequest(method = HttpMethods.POST, uri = PARSER_URI,
       entity = FormData("content" -> content).toEntity)
+    val response = Http().singleRequest(httpRequest)
+    response onFailure {
+      case result =>
+        logger.error("Progress response error ", result)
+        InternalServerError("failure")
+    }
+    response.flatMap(
+      response => {
+        val entity = response.entity.toStrict(5 seconds)
+        entity onFailure {
+          case result =>
+            logger.error("Progress response error ", result)
+            InternalServerError("failure")
+        }
+
+        entity.flatMap(
+          entity => {
+            if (response.status.isSuccess()) {
+              val uuid = entity.data.decodeString("UTF-8")
+              logger.debug("Upload response " + uuid)
+              Future(Ok(uuid))
+            } else {
+              logger.error("Progress response error " + response.status.reason())
+              Future(InternalServerError("failure"))
+            }
+          }
+        )
+      }
+    )
+  }
+
+  def wordDefinitions(word: String): Future[Result] = {
+    val httpRequest = HttpRequest(method = HttpMethods.GET, uri = Uri(PARSER_URI + "/dictionary?word" + word))
     val response = Http().singleRequest(httpRequest)
     response onFailure {
       case result =>
