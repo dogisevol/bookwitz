@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'ngSanitize', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
 
   web.config [
     '$routeProvider',
@@ -29,7 +29,7 @@ define(['angular'], (angular) ->
 
   web.factory 'wordDefinitions',
     ($resource) ->
-      $resource('web/wordDefinitions')
+      $resource('web/wordDefinitions', {word:'@word'})
 
   web.controller 'UserWordsController',
     class UserWordsController
@@ -93,6 +93,10 @@ define(['angular'], (angular) ->
               $scope.gridOptions.data.push(item)
             )
           )
+
+        $scope.showWordInfo = (row) ->
+            $scope.$broadcast("openWordInfo", row.entity.word);
+
         $scope.gridOptions =
             "enableGridMenu": true,
             onRegisterApi : (gridApi)->
@@ -113,7 +117,6 @@ define(['angular'], (angular) ->
               docDefinition
             ,
             exporterPdfOrientation: 'portrait',
-            exporterPdfPageSize: 'LETTER',
             exporterPdfMaxGridWidth: 500,
             exporterCsvLinkElement: angular.element(document.querySelectorAll(".custom-csv-link-location")),
             "enableSorting": true,
@@ -121,6 +124,7 @@ define(['angular'], (angular) ->
             "enableRowSelection": true,
             "selectionRowHeaderWidth": 35,
             "rowHeight": 35,
+            "rowTemplate": "<div ng-dblclick=\"grid.appScope.showWordInfo(row)\" ng-repeat=\"(colRenderIndex, col) in colContainer.renderedColumns track by col.uid\" ui-grid-one-bind-id-grid=\"rowRenderIndex + '-' + col.uid + '-cell'\" class=\"ui-grid-cell ng-scope ui-grid-coluiGrid-0007\" ng-class=\"{ 'ui-grid-row-header-cell': col.isRowHeader }\" role=\"gridcell\" ui-grid-cell=\"\"></div>",
             "showGridFooter":true
             "columnDefs": [
               { "name":"word", "field": "word" },
@@ -131,7 +135,7 @@ define(['angular'], (angular) ->
 
   web.controller 'BookUploadController',
     class BookUploadController
-          constructor: ($scope, Upload, $timeout, $http, $uibModal) ->
+          constructor: ($scope, Upload, $timeout, $http) ->
             $scope.file = {} if $scope.file is undefined
 
             $scope.sendSelected = () ->
@@ -201,20 +205,48 @@ define(['angular'], (angular) ->
                   file.progress = Math.min(100, parseInt(100.0 * evt.loaded / evt.total))
                   return
 
-            $scope.items = ['item1', 'item2', 'item3']
+  web.controller 'ModalWordController',
+    class ModalWordController
+          constructor: ($scope, $uibModal, wordDefinitions) ->
+
+            $scope.$on("openWordInfo", (event, word) -> $scope.openWordInfo(word))
+
+            $scope.examples = [{
+              "name": "<a href='http://www.google.ca'>Nexus S</a>",
+              "snippet": "this one has an anchor tag"
+            }, {
+              "name": "<img src='http://www.w3schools.com/tags/smiley.gif' title='image tag example' />",
+              "snippet": "this one has an image tag"
+            }, {
+              "name": "Just regular text"
+            }]
 
             $scope.openModal = () ->
-                   modalInstance = $uibModal.open({
-                      templateUrl: '/web/vassets/partials/modal.tpl.html',
-                      controller: BookUploadController,
-                      resolve: {
-                        items: ->
-                          return $scope.items
-                      }
-                    }).result
-            $scope.closeModal = ->
-                $modalInstance.close();
+                selectedRows = $scope.gridApi.selection.getSelectedRows()
+                if selectedRows && selectedRows.length == 1
+                    $scope.openWordInfo(selectedRows[0].word)
 
+            $scope.openWordInfo = (word) ->
+                wordDefinitions.get(word: word, (data)->
+                    $scope.modalData = data
+                    text = ''
+                    $scope.modalInstance = $uibModal.open({
+                      templateUrl: '/web/vassets/partials/modal.tpl.html',
+                      controller: ($uibModalInstance ,$scope, modalData) ->
+                        $scope.modalData = modalData
+                        $scope.closeModal = () ->
+                          $uibModalInstance.dismiss('cancel');
+                        $scope.format = (text) ->
+                            result = text.replace(new RegExp(word, 'g'), '<b>'+word+'</b>')
+                            console.log(result)
+                            result
+                      resolve:
+                        modalData: -> $scope.modalData
+                        examples: -> $scope.examples
+                    }).result
+                (err)->
+                    alert('Cannot get definitions wor the word' + word)
+                )
 
   web.directive 'bookwitzInput', ->
     restrict: 'E'

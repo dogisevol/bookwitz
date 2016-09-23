@@ -31,8 +31,10 @@ object BookController {
 
 class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) extends SecureSocial[BasicUser] {
 
-  //val PARSER_URI: String = "https://dictwitz.herokuapp.com/bookUpload"
-  val PARSER_URI: String = "http://localhost:8080/bookUpload"
+  val SERVICES_URI: String = "https://dictwitz.herokuapp.com/"
+  //val SERVICES_URI: String = "http://localhost:8080/"
+  val PARSER_URI: String = SERVICES_URI + "bookUpload"
+  val DICTIONARY_URI: String = SERVICES_URI + "dictionary"
 
   val logger = Logger(getClass)
   implicit val system = ActorSystem()
@@ -119,7 +121,7 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
         logger.error("Progress response error. File is too large " + length)
         Future(BadRequest("Your file is too large, we accept just " + length + " bytes!"))
       }
-      case Right(multipartForm) => {
+        case Right(multipartForm) => {
         val (progressEnumerator, progressChannel) = Concurrent.broadcast[JsValue]
         val file = multipartForm.files.head.ref.file
         forwardUpload(scala.io.Source.fromFile(file).mkString)
@@ -227,8 +229,8 @@ class BookController(override implicit val env: RuntimeEnvironment[BasicUser]) e
     )
   }
 
-  def wordDefinitions(word: String): Future[Result] = {
-    val httpRequest = HttpRequest(method = HttpMethods.GET, uri = Uri(PARSER_URI + "/dictionary?word" + word))
+  def wordDefinitions(word: String) = SecuredAction.async { request =>
+    val httpRequest = HttpRequest(method = HttpMethods.GET, uri = Uri(DICTIONARY_URI + "?word=" + word))
     val response = Http().singleRequest(httpRequest)
     response onFailure {
       case result =>

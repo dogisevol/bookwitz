@@ -1,16 +1,35 @@
-<div ng-controller="BookUploadController">
-    <div class="modal-header">
-        <h3>I'm a modal!</h3>
+<div class="modal-header">
+    <h3>{{modalData.word}}</h3>
+</div>
+<div class="modal-body">
+
+    <div ng-repeat="ex in examples">
+        TEST
+        <div ng-bind-html-unsafe="ex.name"></div>
+        <span>{{ex.snippet}}</span>
     </div>
-    <div class="modal-body">
-        <ul>
-            <li ng-repeat="item in items">
-                <a ng-click="selected.item = item">{{ item }}</a>
-            </li>
-        </ul>
-        Selected: <b>{{ selected.item }}</b>
+
+    <div ng-repeat="ex in modalData.examples">
+        TEST
+        <div nng-bind-html="{{format(ex)}}"></div>
     </div>
-    <div class="modal-footer">
-        <button class="btn btn-primary" ng-click="closeModal()">OK</button>
-    </div>
+
+
+    Pronunciations:
+    <ul>
+        <li ng-repeat="item in modalData.pronunciations" ng-bind-html="{{format(item)}}"/>
+    </ul>
+    <hr/>
+    Definitions:
+    <ul>
+        <li ng-repeat="item in modalData.definitions" ng-bind-html-unsafe="{{format(item)}}"/>
+    </ul>
+    <hr/>
+    Examples:
+    <ul>
+        <li ng-repeat="item in modalData.examples" ng-bind-html-unsafe="{{format(item)}}"/>
+    </ul>
+</div>
+<div class="modal-footer">
+    <button class="btn btn-primary" ng-click="closeModal()">Close</button>
 </div>

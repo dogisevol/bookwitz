@@ -1,5 +1,5 @@
 <book-header h2="Books upload"></book-header>
-<div ng-controller="BooksController">
+<div>
     <div ng-app="fileUpload" ng-controller="BookUploadController as bookUpload">
         <textarea class="contentArea" ng-model="content"></textarea>
         <button type="button" ng-click="uploadText()"
@@ -14,19 +14,19 @@
         <br>
         File:
         <div style="font:smaller">{{f.operation}}{{f.name}} {{errFile.name}} {{errFile.$error}} {{errFile.$errorParam}}
-  <span class="progress" ng-show="f.progress >= 0">
-      <div style="width:{{f.progress}}%"
-           ng-bind="f.progress + '%'"></div>
-  </span>
+            <span class="progress" ng-show="f.progress >= 0">
+                <div style="width:{{f.progress}}%" ng-bind="f.progress + '%'"/>
+            </span>
         </div>
         {{errorMsg}}
-        <br>
-        <div class="well" ng-hide="hideWordsGrid">
-            <div ui-grid="gridOptions" ui-grid-selection ui-grid-pagination  ui-grid-exporter class="grid"></div>
-            <button type="button" ng-click="sendSelected()" class="btn btn-success">
-                Add as known
-            </button>
-            <button class="btn btn-success" ng-click="openModal()">View definitions</button>
-            </div>
+    </div>
+    <div class="well" ng-controller="BooksController">
+        <div ui-grid="gridOptions" ui-grid-selection ui-grid-pagination ui-grid-exporter class="grid"></div>
+        <button type="button" ng-click="sendSelected()" class="btn btn-success">
+            Add as known
+        </button>
+        <button ng-controller="ModalWordController" class="btn btn-success" ng-click="openModal()">View definitions
+        </button>
+        <div ng-dblClick="showWordInfo(1)">test</div>
     </div>
 </div>

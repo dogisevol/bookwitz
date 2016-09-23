@@ -34,7 +34,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "angular-ui" % "0.4.0-3",
   "org.webjars" % "ui-grid" % "3.1.1",
   "org.webjars" % "angular-file-upload" % "11.0.0",
-  "org.webjars" % "angular-ui-bootstrap" % "1.3.3"
+  "org.webjars" % "angular-ui-bootstrap" % "1.3.3",
+  "org.webjars.bower" % "angular-sanitize" % "1.5.8"
 )
 
 libraryDependencies in ThisBuild ++= Seq(
