@@ -20,7 +20,7 @@ require([
     'ui-bootstrap',
     'ui-bootstrap-tpls',
     'ng-file-upload',
-    'ngSanitize'
+    'angular-sanitize'
   ], (angular) ->
 
   bookwitz = angular.module('bookwitz', ['ngResource', 'ngRoute', 'web', 'users', 'ui.grid', 'ngFileUpload'])

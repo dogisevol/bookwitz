@@ -3,31 +3,19 @@
 </div>
 <div class="modal-body">
 
-    <div ng-repeat="ex in examples">
-        TEST
-        <div ng-bind-html-unsafe="ex.name"></div>
-        <span>{{ex.snippet}}</span>
-    </div>
-
-    <div ng-repeat="ex in modalData.examples">
-        TEST
-        <div nng-bind-html="{{format(ex)}}"></div>
-    </div>
-
-
-    Pronunciations:
+    </div><b>Pronunciations:</b>
     <ul>
-        <li ng-repeat="item in modalData.pronunciations" ng-bind-html="{{format(item)}}"/>
+        <li ng-repeat="item in modalData.pronunciations" ng-bind-html="format(item)"/>
     </ul>
     <hr/>
-    Definitions:
+    <b>Definitions:</b>
     <ul>
-        <li ng-repeat="item in modalData.definitions" ng-bind-html-unsafe="{{format(item)}}"/>
+        <li ng-repeat="item in modalData.definitions" ng-bind-html="format(item)"/>
     </ul>
     <hr/>
-    Examples:
+    <b>Examples:</b>
     <ul>
-        <li ng-repeat="item in modalData.examples" ng-bind-html-unsafe="{{format(item)}}"/>
+        <li ng-repeat="item in modalData.examples" ng-bind-html="format(item)"/>
     </ul>
 </div>
 <div class="modal-footer">
