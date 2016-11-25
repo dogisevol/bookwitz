@@ -2,7 +2,7 @@
 
 define(['angular'], (angular) ->
 
-  web = angular.module('web', ['ngResource', 'ngRoute', 'ngSanitize', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
+  web = angular.module('web', ['ngResource', 'ngRoute', 'angular.sanitize', 'ui.bootstrap', 'ui.bootstrap.tpls', 'ui.grid.selection', 'ui.grid.exporter', 'ui.grid.edit'])
 
   web.config [
     '$routeProvider',
